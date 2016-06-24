@@ -3,7 +3,7 @@ MAINTAINER "Olimpiu Rob" <olimpiu.rob@eaudeweb.ro>
 
 ENV EVENT_LOG_LEVEL=INFO \
     Z2_LOG_LEVEL=INFO \
-    ZEO_CLIENT=false \
+    ZEO_CLIENT=true \
     ZEO_ADDRESS=zeoserver:8100 \
     BLOB_CACHE_SIZE=500000000 \
     LOCAL_CONVERTERS_HOST=converter
