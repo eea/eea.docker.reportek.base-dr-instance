@@ -6,6 +6,10 @@ Docker base image for Zope with Eionet Data Repository specific Add-ons and sett
 
   - `:latest` (default)
 
+### Base docker image
+
+ - [hub.docker.com](https://hub.docker.com/r/eeacms/reportek-base-dr/)
+
 ### Source code
 
   - [github.com](http://github.com/eea/eea.docker.reportek.base-dr-instance)
@@ -18,10 +22,11 @@ Docker base image for Zope with Eionet Data Repository specific Add-ons and sett
 
 ## Usage
 
-See [eeacms/zope](https://registry.hub.docker.com/u/eeacms/zope)
+See [eeacms/zope](https://hub.docker.com/r/eeacms/zope)
 
 ## Upgrade
 
+    $ docker pull eeacms/reportek-base-dr
 
 ## Copyright and license
 
