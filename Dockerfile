@@ -6,6 +6,8 @@ ENV EVENT_LOG_LEVEL=INFO \
     ZEO_CLIENT=true \
     ZEO_ADDRESS=zeoserver:8100 \
     BLOB_CACHE_SIZE=500000000 \
+    SETUPTOOLS=28.6.0 \
+    ZCBUILDOUT=2.5.3 \
     LOCAL_CONVERTERS_HOST=converter
 
 COPY src/versions.cfg           \
