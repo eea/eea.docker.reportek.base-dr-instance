@@ -1,22 +1,22 @@
 FROM eeacms/zope:2.13.22
 MAINTAINER "Olimpiu Rob" <olimpiu.rob@eaudeweb.ro>
 
-ENV EVENT_LOG_LEVEL=INFO \
-    Z2_LOG_LEVEL=INFO \
-    ZEO_CLIENT=true \
-    ZEO_ADDRESS=zeoserver:8100 \
-    ZSERVER_THREADS=4 \
-    BLOB_CACHE_SIZE=500000000 \
-    SETUPTOOLS=28.6.0 \
+#ENV EVENT_LOG_LEVEL=INFO \
+#    Z2_LOG_LEVEL=INFO \
+#    ZEO_CLIENT=true \
+#    ZEO_ADDRESS=zeoserver:8100 \
+#    ZSERVER_THREADS=4 \
+#    BLOB_CACHE_SIZE=500000000 \
+ENV SETUPTOOLS=28.6.0 \
     ZCBUILDOUT=2.5.3 \
     LOCAL_CONVERTERS_HOST=converter
 
-COPY src/versions.cfg           \
-     src/sources.cfg            \
-     src/dr-instance.cfg        \
-     src/base.cfg               $ZOPE_HOME/
-
 USER root
+COPY src/*    $ZOPE_HOME/
+RUN mv /docker-entrypoint.sh    /zope-entrypoint.sh
+COPY docker-entrypoint.sh       \
+     docker-initialize.py       /
+
 RUN ./install.sh              \
     chown -R 500:500 $ZOPE_HOME
 
