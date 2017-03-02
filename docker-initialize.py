@@ -162,7 +162,7 @@ ZEO_TEMPLATE = """
       name zeostorage
       var /opt/zope/parts/instance/var
       cache-size {zeo_client_cache_size}
-      zeo-client-blob-cache-size {zeo_client_blob_cache_size}
+      blob-cache-size {zeo_client_blob_cache_size}
     </zeoclient>
 """.strip()
 
