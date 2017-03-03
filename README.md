@@ -28,6 +28,24 @@ See [eeacms/zope](https://hub.docker.com/r/eeacms/zope)
 
     $ docker pull eeacms/reportek-base-dr
 
+## Supported environment variables
+
+On top of the environment variables supported by the base [eeacms/zope](https://hub.docker.com/r/eeacms/zope) image, you can also use the following variables which won't trigger a re-run of the buildout process:
+- `ZOPE_THREADS` - default `2`
+- `ZOPE_FAST_LISTEN` - default `off`
+- `ZOPE_FORCE_CONNECTION_CLOSE` - default `on`
+- `ZEO_ADDRESS` - format `<hostname_or_ip>:<port>`
+- `ZEO_READ_ONLY` - default `false`
+- `ZEO_CLIENT_READ_ONLY_FALLBACK` - default `false`
+- `ZEO_SHARED_BLOB_DIR` - default `off`
+- `ZEO_STORAGE` - default `1`
+- `ZEO_CLIENT_CACHE_SIZE` - default `128MB`
+- `ZEO_CLIENT_BLOB_CACHE_SIZE` - default `500000000` in bytes
+- `EVENT_LOG_LEVEL` - default `INFO`
+- `ACCESS_LOG_LEVEL` - default `WARN`
+- `GRAYLOG` - format `<hostname_or_ip>:<port>`
+- `GRAYLOG_FACILITY`
+
 ## Copyright and license
 
 The Initial Owner of the Original Code is European Environment Agency (EEA).
