@@ -20,6 +20,7 @@ class Environment(object):
         self.evt_log_level = self.env.get('EVENT_LOG_LEVEL', 'INFO').upper()
         self.access_log_level = self.env.get('ACCESS_LOG_LEVEL', 'WARN').upper()
         self.facility = self.env.get('GRAYLOG_FACILITY', 'instance')
+        self.session_manager_timeout = self.env.get('SESSION_MANAGER_TIMEOUT', '')
 
         self._conf = ''
 
@@ -125,6 +126,19 @@ class Environment(object):
         self.conf = self.conf.replace(
             'force-connection-close on', 'force-connection-close %s' % self.force_connection_close)
 
+    def zope_session_timeout_minutes(self):
+        """ session-timeout-minutes
+        """
+        if not self.session_manager_timeout:
+            return
+        zst = 'session-timeout-minutes %s' % self.session_manager_timeout
+
+        if 'session-timeout-minutes' in self.conf:
+            pattern = re.compile(r"session-timeout-minutes.+$", re.MULTILINE)
+            re.sub(pattern, zst, self.conf)
+        else:
+            self.conf = '\n'.join([self.conf, zst])
+
     def finish(self):
         conf = self.conf
         with open(self.zope_conf, 'w') as zfile:
@@ -139,6 +153,7 @@ class Environment(object):
         self.zope_threads()
         self.zope_fast_listen()
         self.zope_force_connection_close()
+        self.zope_session_timeout_minutes()
         self.finish()
 
     __call__ = setup
