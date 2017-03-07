@@ -34,6 +34,7 @@ On top of the environment variables supported by the base [eeacms/zope](https://
 - `ZOPE_THREADS` - default `2`
 - `ZOPE_FAST_LISTEN` - default `off`
 - `ZOPE_FORCE_CONNECTION_CLOSE` - default `on`
+- `SESSION_MANAGER_TIMEOUT` - in minutes
 - `ZEO_ADDRESS` - format `<hostname_or_ip>:<port>`
 - `ZEO_READ_ONLY` - default `false`
 - `ZEO_CLIENT_READ_ONLY_FALLBACK` - default `false`
