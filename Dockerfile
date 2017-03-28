@@ -1,4 +1,4 @@
-FROM eeacms/zope:2.13.22
+FROM eeacms/zope:2.13.26-1.0
 MAINTAINER "Olimpiu Rob" <olimpiu.rob@eaudeweb.ro>
 
 ENV SETUPTOOLS=28.6.0 \
