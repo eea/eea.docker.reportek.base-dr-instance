@@ -41,14 +41,21 @@ if [[ $START == *"$1"* ]]; then
     trap _stop SIGTERM SIGINT
     if [[ $HTTP_SERVER == *wsgi* ]]; then
       $WSGI_CMD start
-      sleep 2
     else
       $CMD start
     fi
 
     child=$!
+
     if [[ $HTTP_SERVER == *wsgi* ]]; then
-      pid=`cat paster.pid`
+      for i in {1..5}; do
+        sleep 1
+        printf "."
+        pid=`cat paster.pid`
+        if [ -n "$pid" ]; then
+          break
+        fi
+      done
     else
       pid=`$CMD status | sed 's/[^0-9]*//g'`
     fi
