@@ -8,6 +8,7 @@ ENV SETUPTOOLS=28.6.0 \
 USER root
 COPY src/*                      $ZOPE_HOME/
 COPY zope-setup.sh              \
+     docker-entrypoint.sh       \
      docker-initialize.py       /
 
 RUN ./install.sh              \

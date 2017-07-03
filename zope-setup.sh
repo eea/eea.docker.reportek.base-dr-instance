@@ -9,12 +9,26 @@ python /docker-initialize.py
 # Avoid running buildout on docker start
 if [[ "$LAST_CFG" == *base.cfg ]]; then
   if ! test -e $ZOPE_HOME/buildout.cfg; then
-      python /configure.py
+    python /configure.py
   fi
 
   if test -e $ZOPE_HOME/buildout.cfg; then
-      ./bin/buildout -c buildout.cfg
-      python /docker-initialize.py
+    ./bin/buildout -c buildout.cfg
+    python /docker-initialize.py
+  fi
+fi
+
+# If the HTTP_SERVER is wsgi remove the <http-server></http-server> block
+if [[ $HTTP_SERVER == *wsgi* ]]; then
+  sed -i '/<http-server/,/<\/http-server/d' parts/instance/etc/zope.conf
+else
+  if [[ $(sed -n '/<http-server/,/<\/http-server/p' parts/instance/etc/zope.conf | wc -c) -eq 0 ]]; then
+    HTTP_ADDRESS=`grep http-address .installed.cfg | cut -d'=' -f2`
+    echo "
+      <http-server>
+        address ${HTTP_ADDRESS}
+      </http-server>
+    " >> parts/instance/etc/zope.conf
   fi
 fi
 
