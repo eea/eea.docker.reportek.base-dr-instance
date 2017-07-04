@@ -31,7 +31,8 @@ if [[ $START == *"$1"* ]]; then
   else
     _stop() {
       if [[ $HTTP_SERVER == *wsgi* ]]; then
-        $WSGI_CMD stop
+        $WSGI_CMD stop &
+        rm paster.pid
       else
         $CMD stop
       fi
