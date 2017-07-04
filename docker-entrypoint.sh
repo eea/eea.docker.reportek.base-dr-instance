@@ -48,7 +48,7 @@ if [[ $START == *"$1"* ]]; then
     child=$!
 
     if [[ $HTTP_SERVER == *wsgi* ]]; then
-      for i in {1..5}; do
+      for i in {1..10}; do
         sleep 1
         printf "."
         pid=`cat paster.pid`
@@ -59,7 +59,7 @@ if [[ $START == *"$1"* ]]; then
     else
       pid=`$CMD status | sed 's/[^0-9]*//g'`
     fi
-    
+
     if [ ! -z "$pid" ]; then
       echo "Application running on pid=$pid"
       sleep "$HEALTH_CHECK_TIMEOUT"
