@@ -75,7 +75,7 @@ class Environment(object):
             return
 
         if 'raven.contrib.zope' in self.conf:
-            self.log('Sending logs to sentry: %s')
+            self.log('Sending logs to sentry: %s', self.sentry)
             return
 
         if self.graylog:
