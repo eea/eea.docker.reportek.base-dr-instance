@@ -44,8 +44,6 @@ On top of the environment variables supported by the base [eeacms/zope](https://
 - `ZEO_CLIENT_BLOB_CACHE_SIZE` - default `500000000` in bytes
 - `EVENT_LOG_LEVEL` - default `INFO`
 - `ACCESS_LOG_LEVEL` - default `WARN`
-- `GRAYLOG` - format `<hostname_or_ip>:<port>`
-- `GRAYLOG_FACILITY`
 - `SENTRY` - format `'<PROTOCOL>://<PUBLIC_KEY>:<SECRET_KEY>@<HOST>/<PATH><PROJECT_ID>'`
 - `SENTRY_LOG_LEVEL` - default `ERROR`
 - `ZIP_CACHE_ENABLED` - default `true`

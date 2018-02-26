@@ -14,8 +14,6 @@ class Environment(object):
         self.fast_listen = self.env.get('ZOPE_FAST_LISTEN', '')
         self.force_connection_close = self.env.get('ZOPE_FORCE_CONNECTION_CLOSE', '')
         self.zope_conf = '/opt/zope/parts/instance/etc/zope.conf'
-        self.graylog = self.env.get('GRAYLOG', '')
-        self.facility = self.env.get('GRAYLOG_FACILITY', 'instance')
         self.sentry = self.env.get('SENTRY', '')
         self.sentry_log_level = self.env.get('SENTRY_LOG_LEVEL', 'ERROR').upper()
         self.evt_log_level = self.env.get('EVENT_LOG_LEVEL', 'INFO').upper()
@@ -67,22 +65,13 @@ class Environment(object):
     def zope_log(self):
         """ Zope logging
         """
-        if not self.graylog and not self.sentry:
-            return
-
-        if 'eea.graylogger' in self.conf:
-            self.log('Sending logs to graylog: %s', self.graylog)
+        if not self.sentry:
             return
 
         if 'raven.contrib.zope' in self.conf:
             self.log('Sending logs to sentry: %s', self.sentry)
             return
 
-        if self.graylog:
-            self.log("Sending logs to graylog: '%s' as facility: '%s'",
-                     self.graylog, self.facility)
-            graylog_tmpl = GRAYLOG_TEMPLATE % (self.graylog, self.facility)
-            self.conf = "%import eea.graylogger\n" + self.conf.replace('</logfile>', "</logfile>%s" % graylog_tmpl)
         if self.sentry:
             self.log("Sending logs to sentry: '%s'", self.sentry)
             sentry_tmpl = SENTRY_TEMPLATE % (self.sentry, self.sentry_log_level)
@@ -171,13 +160,6 @@ class Environment(object):
 
     __call__ = setup
 
-
-GRAYLOG_TEMPLATE = """
-  <graylog>
-    server %s
-    facility %s
-  </graylog>
-"""
 
 SENTRY_TEMPLATE = """
     <sentry>
