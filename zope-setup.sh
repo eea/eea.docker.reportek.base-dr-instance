@@ -13,7 +13,7 @@ if [[ "$LAST_CFG" == *base.cfg ]]; then
   fi
 
   if test -e $ZOPE_HOME/buildout.cfg; then
-      ./bin/buildout -c buildout.cfg
+      buildout -c buildout.cfg
       python /docker-initialize.py
   fi
 fi
