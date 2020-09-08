@@ -15,7 +15,7 @@ RUN buildDeps="gcc" \
  && apt-get install -y --no-install-recommends $buildDeps \
  && apt-get install -y --no-install-recommends $runDeps \
  && echo "zope-www ALL = NOPASSWD: /etc/init.d/cron"  > /etc/sudoers \
- && pip install python-ldap==2.4.38 \
+ && pip install python-ldap==2.4.38 python-dateutil \
  && cd $ZOPE_HOME && ./install.sh \
  && chown -R 500:500 $ZOPE_HOME \
  && apt-get purge -y --auto-remove $buildDeps \

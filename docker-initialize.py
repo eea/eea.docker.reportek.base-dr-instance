@@ -62,6 +62,21 @@ class Environment(object):
         pattern = re.compile(r"<blobstorage>.+</blobstorage>", re.DOTALL)
         self.conf = re.sub(pattern, zeo_conf, self.conf)
 
+    def zeo_temp_storage(self):
+        """ Use a tempstorage from zeo server
+        """
+        server = os.environ.get("ZEO_ADDRESS", None)
+        zeo_temp_storage = os.environ.get('ZEO_TEMP_STORAGE', 'temp')
+        if "<zodb_db temporary>" not in self.conf or not server or not zeo_temp_storage:
+            return
+        zodb_temp = ZODB_TEMP_STORAGE_TEMPLATE.format(
+            zeo_address=server,
+            zeo_temp_storage=zeo_temp_storage,
+            zeo_client_cache_size=os.environ.get('ZEO_CLIENT_CACHE_SIZE', '128MB'),
+        )
+        pattern = re.compile(r"<zodb_db temporary>.+</zodb_db>", re.DOTALL)
+        self.conf = re.sub(pattern, zodb_temp, self.conf)
+
     def zope_log(self):
         """ Zope logging
         """
@@ -150,6 +165,7 @@ class Environment(object):
         """ Configure
         """
         self.zeo_mode()
+        self.zeo_temp_storage()
         self.zope_log()
         self.zope_log_level()
         self.zope_threads()
@@ -183,6 +199,19 @@ ZEO_TEMPLATE = """
     </zeoclient>
 """.strip()
 
+ZODB_TEMP_STORAGE_TEMPLATE = """
+    <zodb_db temporary>
+        mount-point /temp_folder
+        cache-size 10000
+        container-class Products.TemporaryFolder.TemporaryContainer
+      <zeoclient>
+          server {zeo_address}
+          storage {zeo_temp_storage}
+          var /opt/zope/parts/instance/var
+          cache-size {zeo_client_cache_size}
+      </zeoclient>
+     </zodb_db>
+""".strip()
 
 def initialize():
     """ Configure
