@@ -3,6 +3,7 @@ set -e
 
 COMMANDS="debug help logtail show stop adduser fg kill quit run wait console foreground logreopen reload shell status"
 CRONJOB="cronjob"
+COVERAGE="coverage"
 START="start restart"
 CMD="bin/instance"
 SETUPCMD="/zope-setup.sh"
