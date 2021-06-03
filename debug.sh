@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 cd /opt/zope
 if [ ! -z "$GIT_NAME" ]; then
@@ -15,17 +16,17 @@ if [ ! -z "$GIT_NAME" ]; then
        git pull
     fi
     cd ../..
-    sed -i "s|^$GIT_NAME .*$|$GIT_NAME = fs $GIT_NAME|g" sources.cfg
+    sed -i "s|^$GIT_NAME .*$|$GIT_NAME = fs $GIT_NAME|g" sources-devel.cfg
     if [[ "$GIT_BRANCH" == "hotfix"* ||  "$GIT_BRANCH" == "HOTFIX"* ||  "$GIT_BRANCH" == "Hotfix"* ||  "$GIT_BRANCH" == "HotFix"* || ! -z "$GIT_CHANGE_ID" ]]; then
-      echo "Switching sources.cfg to master"
-      sed -i "s|branch=develop|branch=master|g" sources.cfg
+      echo "Switching sources-devel.cfg to master"
+      sed -i "s|branch=develop|branch=master|g" sources-devel.cfg
     fi
   fi
 fi
 
 if [[ "$GIT_BRANCH" == "master" ]]; then
-  echo "Switching sources.cfg to master"
-  sed -i "s|branch=develop|branch=master|g" sources.cfg
+  echo "Switching sources-devel.cfg to master"
+  sed -i "s|branch=develop|branch=master|g" sources-devel.cfg
 fi
 
 bin/develop rb
