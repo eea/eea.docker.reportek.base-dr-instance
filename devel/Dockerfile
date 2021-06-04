@@ -1,5 +1,5 @@
-#FROM eeacms/reportek-base-dr
-FROM basedr
+FROM eeacms/reportek-base-dr
+
 USER root
 RUN apt-get update \
  && apt-get install -y --no-install-recommends build-essential \
