@@ -1,4 +1,4 @@
-FROM eeacms/zope:2.13.29
+FROM eeacms/zope:2.13.30
 MAINTAINER "EEA: IDM2 C-TEAM" <eea-edw-c-team-alerts@googlegroups.com>
 
 ENV LOCAL_CONVERTERS_HOST=converter
