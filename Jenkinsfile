@@ -54,12 +54,6 @@ pipeline {
 //    }  
 
      stage('Commit on master') {
-      when {
-        allOf {
-          environment name: 'CHANGE_ID', value: ''
-          branch 'master'
-        }
-      }
       steps {
         node(label: 'docker') {
           withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'eea-jenkins', usernameVariable: 'EGGREPO_USERNAME', passwordVariable: 'EGGREPO_PASSWORD'],string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN'),[$class: 'UsernamePasswordMultiBinding', credentialsId: 'pypi-jenkins', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD']]) {
