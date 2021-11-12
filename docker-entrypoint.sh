@@ -1,61 +1,88 @@
 #!/bin/bash
 set -e
+set -x
 
-COMMANDS="debug help logtail show stop adduser fg kill quit run wait console foreground logreopen reload shell status"
-CRONJOB="cronjob"
-COVERAGE="coverage"
-START="start restart"
-CMD="bin/instance"
-SETUPCMD="/zope-setup.sh"
+GIT_NAME="Products.Reportek"
 
-$SETUPCMD
-
-if [ -z "$HEALTH_CHECK_TIMEOUT" ]; then
-  HEALTH_CHECK_TIMEOUT=1
-fi
-
-if [ -z "$HEALTH_CHECK_INTERVAL" ]; then
-  HEALTH_CHECK_INTERVAL=1
-fi
-
-if [[ $START == *"$1"* ]]; then
-  if [ ! -z $DEBUG ]; then
-    if [[ $DEBUG == *on* ]]; then
-      exec $CMD fg
-    fi
-  else
-    _stop() {
-      $CMD stop
-      kill -TERM $child 2>/dev/null
-    }
-
-    trap _stop SIGTERM SIGINT
-    $CMD start
-
-    child=$!
-    pid=`$CMD status | sed 's/[^0-9]*//g'`
-    if [ ! -z "$pid" ]; then
-      echo "Application running on pid=$pid"
-      sleep "$HEALTH_CHECK_TIMEOUT"
-      while kill -0 "$pid" 2> /dev/null; do
-        sleep "$HEALTH_CHECK_INTERVAL"
-      done
+cd /opt/zope
+if [ ! -z "$GIT_NAME" ]; then
+  if [ ! -z "$GIT_BRANCH" ]; then
+    cd src/$GIT_NAME
+    git pull
+    if [ ! -z "$GIT_CHANGE_ID" ]; then
+       GIT_BRANCH=PR-${GIT_CHANGE_ID}
+       git fetch origin pull/$GIT_CHANGE_ID/head:$GIT_BRANCH
+       git checkout $GIT_BRANCH
     else
-      echo "Application didn't start normally. Shutting down!"
-      _stop
+       git checkout $GIT_BRANCH
+       git pull
+    fi
+    cd ../..
+    sed -i "s|^$GIT_NAME .*$|$GIT_NAME = fs $GIT_NAME|g" sources-devel.cfg
+    if [[ "$GIT_BRANCH" == "hotfix"* ||  "$GIT_BRANCH" == "HOTFIX"* ||  "$GIT_BRANCH" == "Hotfix"* ||  "$GIT_BRANCH" == "HotFix"* || ! -z "$GIT_CHANGE_ID" ]]; then
+      echo "Switching sources-devel.cfg to master"
+      sed -i "s|branch=develop|branch=master|g" sources-devel.cfg
     fi
   fi
+fi
+
+if [[ "$GIT_BRANCH" == "master" ]]; then
+  echo "Switching sources-devel.cfg to master"
+  sed -i "s|branch=develop|branch=master|g" sources-devel.cfg
+fi
+echo $GIT_NAME
+bin/develop rb
+python /docker-initialize.py
+
+if [ -z "$1" ]; then
+  echo "============================================================="
+  echo "All set. Now you can dive into container and start debugging:"
+  echo "                                                             "
+  echo "    $ docker exec -it <container_name_or_id> bash            "
+  echo "    $ ps aux                                                 "
+  echo "    $ bin/instance fg                                        "
+  echo "                                                             "
+  echo "============================================================="
+  exec cat
+fi
+
+# Coverage
+if [ "$1" == "coverage" ]; then
+    cd src/$GIT_NAME
+    ../../bin/coverage run ../../bin/xmltestreport --test-path $(pwd) -v -vv -s $GIT_NAME
+    ../../bin/report xml --include=*$GIT_NAME*
+    exit 0
+fi
+
+# Tests
+if [ "$1" == "tests" ]; then
+ for i in $(ls src); do
+
+   # Auto exclude tests
+   if ! grep -q "$i" bin/test; then
+       echo "============================================================="
+       echo "Auto: Skipping tests for: $i                                 "
+       continue
+   fi
+
+   # Manual exclude tests
+   if [ ! -z "$EXCLUDE" ]; then
+     if [[ $EXCLUDE == *"$i"* ]]; then
+       echo "============================================================="
+       echo "Manual: Skipping tests for: $i                               "
+       continue
+     fi
+   fi
+
+   # Run tests
+   echo "============================================================="
+   echo "Running tests for:                                           "
+   echo "                                                             "
+   echo "    $i                                                       "
+   echo "                                                             "
+
+   ./bin/test --test-path /opt/zope/src/$i -v -vv -s $i
+  done
 else
-  if [[ $COMMANDS == *"$1"* ]]; then
-    exec $CMD "$@"
-  elif [[ $CRONJOB == *"$1"* && ! -z $CRONTAB ]]; then
-    echo "$CRONTAB" > /tmp/crontab
-    # start netcat to keep the healthchecker happy
-    nc -lkp 8080 &>/dev/null &
-    crontab /tmp/crontab
-    sudo /etc/init.d/cron start
-    tail -f /dev/null
-  else
-    exec "$@"
-  fi
+  exec "$@"
 fi
