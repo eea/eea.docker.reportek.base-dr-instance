@@ -6,6 +6,7 @@ pipeline {
     dockerhubrepo = "eeacms/reportek-base-dr"
     DEPENDENT_DOCKERFILE_URL="eea/eea.docker.reportek.mdr-instance/blob/master/Dockerfile eea/eea.docker.reportek.cdr-instance/blob/master/Dockerfile eea/eea.docker.reportek.bdr-instance/blob/master/Dockerfile"
     UPDATE_MASTER_BRANCH="yes"
+    EGG_NAME = "Products.Reportek"
   }
   
   stages {
