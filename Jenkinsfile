@@ -23,35 +23,36 @@ pipeline {
      }
    }
 
-    stage('Testing') {
-      when { 
-         branch 'develop'
-      }
-      steps {
-        parallel(
-          
-          "Coverage": {
-            node(label: 'docker') {
-              script {
-                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                  sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/reportek-base-dr-develop coverage'''
-                }
-              }
-            }
-          },
+//    stage('Testing') {
+//      when { 
+//         branch 'develop'
+//      }
+//      steps {
+//        parallel(
+//          
+//          "Coverage": {
+//            node(label: 'docker') {
+//              script {
+//                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+//                  sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/reportek-base-dr-develop coverage'''
+//                }
+//              }
+//            }
+//          },
+//
+//          "Tests": {
+//            node(label: 'docker') {
+//              script {
+//                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+//                  sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/reportek-base-dr-develop tests'''
+//                }
+//              }
+//            }
+//          }
+//        )
+//      }
+//    }  
 
-          "Tests": {
-            node(label: 'docker') {
-              script {
-                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                  sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/reportek-base-dr-develop tests'''
-                }
-              }
-            }
-          }
-        )
-      }
-    }  
      stage('Commit on master') {
       when {
         allOf {
