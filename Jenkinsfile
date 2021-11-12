@@ -5,6 +5,7 @@ pipeline {
     GIT_NAME = "eea.docker.reportek.base-dr-instance"
     dockerhubrepo = "eeacms/reportek-base-dr"
     DEPENDENT_DOCKERFILE_URL="eea/eea.docker.reportek.mdr-instance/blob/master/Dockerfile eea/eea.docker.reportek.cdr-instance/blob/master/Dockerfile eea/eea.docker.reportek.bdr-instance/blob/master/Dockerfile"
+    UPDATE_MASTER_BRANCH="yes"
   }
   
   stages {
@@ -22,14 +23,13 @@ pipeline {
      }
    }
 
-
-    stage('Cosmetics') {
+    stage('Testing') {
       when { 
          branch 'develop'
       }
       steps {
         parallel(
-
+          
           "Coverage": {
             node(label: 'docker') {
               script {
@@ -51,9 +51,23 @@ pipeline {
           }
         )
       }
+    }  
+     stage('Commit on master') {
+      when {
+        allOf {
+          environment name: 'CHANGE_ID', value: ''
+          branch 'master'
+        }
+      }
+      steps {
+        node(label: 'docker') {
+          withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'eea-jenkins', usernameVariable: 'EGGREPO_USERNAME', passwordVariable: 'EGGREPO_PASSWORD'],string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN'),[$class: 'UsernamePasswordMultiBinding', credentialsId: 'pypi-jenkins', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD']]) {
+            sh '''docker run -i --rm --name="$BUILD_TAG-gitflow-master" -e GIT_BRANCH="$BRANCH_NAME" -e EGGREPO_USERNAME="$EGGREPO_USERNAME" -e EGGREPO_PASSWORD="$EGGREPO_PASSWORD" -e GIT_NAME="$GIT_NAME"  -e PYPI_USERNAME="$PYPI_USERNAME"  -e PYPI_PASSWORD="$PYPI_PASSWORD" -e GIT_ORG="$GIT_ORG" -e GIT_TOKEN="$GITHUB_TOKEN" -e UPDATE_MASTER_BRANCH="$UPDATE_MASTER_BRANCH" eeacms/gitflow'''
+          }
+        }
+      }
     }
-
- }
+  }
 
   post {
     changed {
