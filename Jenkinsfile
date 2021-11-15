@@ -65,6 +65,7 @@ pipeline {
            sh ''' git add src/versions.cfg'''
            sh ''' git commit -m "Updated versions.cfg"'''
            sh ''' git push'''
+           sh ''' rm -rf ./''' 
           }
         }
       }
