@@ -57,12 +57,12 @@ pipeline {
       steps {
         node(label: 'docker') {
           withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
-           sh ''' ls -la ./; rm -rf *; ls -la ./'''
+           sh ''' ls -la ./; rm -rf .* *; ls -la ./'''
            sh ''' git clone https://$GIT_USER:$GITHUB_TOKEN@github.com/eea/${GIT_NAME}.git ./$GIT_NAME; cd ./$GIT_NAME; git reset --hard origin/master'''
            sh ''' curl https://raw.githubusercontent.com/eea/$GIT_NAME/develop/src/versions.cfg --output src/versions.cfg'''
            sh ''' git add src/versions.cfg'''
            sh ''' git status; git commit -m "Updated versions.cfg"; sed -i "s/null:null/$GIT_USER:$GITHUB_TOKEN/" .git/config; git push'''
-           sh ''' cd ..; rm -rf ./''' 
+           sh ''' cd ..; rm -rf .* *''' 
           }
         }
       }
