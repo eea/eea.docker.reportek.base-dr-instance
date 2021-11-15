@@ -64,6 +64,7 @@ pipeline {
            sh ''' git clone $GIT_SRC ./$GIT_NAME; cd ./$GIT_NAME'''
            sh ''' curl https://raw.githubusercontent.com/eea/$GIT_NAME.git/develop/src/versions.cfg --output src/versions.cfg'''
            sh ''' git add src/versions.cfg'''
+           sh ''' grep Repo src/versions.cfg'''
            sh ''' git commit -m "Updated versions.cfg"; git push $GIT_SRC'''
            sh ''' cd ..; rm -rf ./$GIT_NAME''' 
           }
