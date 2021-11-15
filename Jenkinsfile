@@ -7,7 +7,7 @@ pipeline {
     DEPENDENT_DOCKERFILE_URL="eea/eea.docker.reportek.mdr-instance/blob/master/Dockerfile eea/eea.docker.reportek.cdr-instance/blob/master/Dockerfile eea/eea.docker.reportek.bdr-instance/blob/master/Dockerfile"
     UPDATE_MASTER_BRANCH="yes"
     EGG_NAME = "Products.Reportek"
-    GIT_SRC= "https://$GIT_USER:$GIT_TOKEN@github.com/eea/${GIT_NAME}.git"
+    GIT_SRC = "https://$GIT_USER:$GIT_TOKEN@github.com/eea/${GIT_NAME}.git"
   }
   
   stages {
@@ -63,7 +63,7 @@ pipeline {
            sh ''' git clone $GIT_SRC ./'''
            sh ''' curl https://raw.githubusercontent.com/eea/$GIT_NAME.git/src/versions.cfg > src/versions.cfg'''
            sh ''' git add src/versions.cfg'''
-           sh ''' git commit -m "Updated versions.cfg"
+           sh ''' git commit -m "Updated versions.cfg'''
            sh ''' git push'''
           }
         }
