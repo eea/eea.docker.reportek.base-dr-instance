@@ -62,7 +62,7 @@ pipeline {
             // sh '''docker pull eeacms/gitflow; docker run -i --rm --name="$BUILD_TAG-gitflow-master" -e GIT_BRANCH="$BRANCH_NAME" -e EGGREPO_USERNAME="$EGGREPO_USERNAME" -e EGGREPO_PASSWORD="$EGGREPO_PASSWORD" -e GIT_NAME="$GIT_NAME"  -e PYPI_USERNAME="$PYPI_USERNAME"  -e PYPI_PASSWORD="$PYPI_PASSWORD" -e GIT_ORG="$GIT_ORG" -e GIT_TOKEN="$GITHUB_TOKEN" -e UPDATE_MASTER_BRANCH="$UPDATE_MASTER_BRANCH" -e EGG_NAME=$EGG_NAME eeacms/gitflow'''
            sh ''' rm -rf ./$GIT_NAME'''
            sh ''' git clone $GIT_SRC ./$GIT_NAME; cd ./$GIT_NAME'''
-           sh ''' curl https://raw.githubusercontent.com/eea/$GIT_NAME.git/develop/src/versions.cfg > src/versions.cfg'''
+           sh ''' curl https://raw.githubusercontent.com/eea/$GIT_NAME.git/develop/src/versions.cfg --output src/versions.cfg'''
            sh ''' git add src/versions.cfg'''
            sh ''' git commit -m "Updated versions.cfg"; git push $GIT_SRC'''
            sh ''' cd ..; rm -rf ./$GIT_NAME''' 
