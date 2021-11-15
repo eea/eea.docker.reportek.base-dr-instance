@@ -5,9 +5,6 @@ pipeline {
     GIT_NAME = "eea.docker.reportek.base-dr-instance"
     dockerhubrepo = "eeacms/reportek-base-dr"
     DEPENDENT_DOCKERFILE_URL="eea/eea.docker.reportek.mdr-instance/blob/master/Dockerfile eea/eea.docker.reportek.cdr-instance/blob/master/Dockerfile eea/eea.docker.reportek.bdr-instance/blob/master/Dockerfile"
-    UPDATE_MASTER_BRANCH="yes"
-    EGG_NAME = "Products.Reportek"
-    GIT_SRC = "https://$GIT_USER:$GIT_TOKEN@github.com/eea/${GIT_NAME}.git"
   }
   
   stages {
@@ -58,14 +55,14 @@ pipeline {
      stage('Commit on master') {
       steps {
         node(label: 'docker') {
-          withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
+          withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN'), string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_USER')]) {
             // sh '''docker pull eeacms/gitflow; docker run -i --rm --name="$BUILD_TAG-gitflow-master" -e GIT_BRANCH="$BRANCH_NAME" -e EGGREPO_USERNAME="$EGGREPO_USERNAME" -e EGGREPO_PASSWORD="$EGGREPO_PASSWORD" -e GIT_NAME="$GIT_NAME"  -e PYPI_USERNAME="$PYPI_USERNAME"  -e PYPI_PASSWORD="$PYPI_PASSWORD" -e GIT_ORG="$GIT_ORG" -e GIT_TOKEN="$GITHUB_TOKEN" -e UPDATE_MASTER_BRANCH="$UPDATE_MASTER_BRANCH" -e EGG_NAME=$EGG_NAME eeacms/gitflow'''
            sh ''' rm -rf ./$GIT_NAME'''
-           sh ''' git clone $GIT_SRC ./$GIT_NAME; cd ./$GIT_NAME'''
+           sh ''' git clone https://$GIT_USER:$GIT_TOKEN@github.com/eea/${GIT_NAME}.git ./$GIT_NAME; cd ./$GIT_NAME'''
            sh ''' curl https://raw.githubusercontent.com/eea/$GIT_NAME.git/develop/src/versions.cfg --output src/versions.cfg'''
            sh ''' git add src/versions.cfg'''
            sh ''' grep Repo src/versions.cfg'''
-           sh ''' git commit -m "Updated versions.cfg"; git push $GIT_SRC'''
+           sh ''' git commit -m "Updated versions.cfg"; git push'''
            sh ''' cd ..; rm -rf ./$GIT_NAME''' 
           }
         }
