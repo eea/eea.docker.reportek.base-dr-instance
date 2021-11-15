@@ -16,8 +16,7 @@ pipeline {
       steps {
         node(label: 'docker') {
           withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN'), usernamePassword(credentialsId: 'jekinsdockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
-            sh '''env'''
-            //sh '''docker pull eeacms/gitflow; docker run -i --rm --name="$BUILD_TAG" -e GIT_BRANCH="master" -e GIT_NAME="$GIT_NAME" -e DOCKERHUB_REPO="$dockerhubrepo" -e GIT_TOKEN="$GITHUB_TOKEN" -e DOCKERHUB_USER="$DOCKERHUB_USER" -e DOCKERHUB_PASS="$DOCKERHUB_PASS"  -e DEPENDENT_DOCKERFILE_URL="$DEPENDENT_DOCKERFILE_URL" -e GITFLOW_BEHAVIOR="TAG_ONLY" eeacms/gitflow'''
+            sh '''docker pull eeacms/gitflow; docker run -i --rm --name="$BUILD_TAG" -e GIT_BRANCH="master" -e GIT_NAME="$GIT_NAME" -e DOCKERHUB_REPO="$dockerhubrepo" -e GIT_TOKEN="$GITHUB_TOKEN" -e DOCKERHUB_USER="$DOCKERHUB_USER" -e DOCKERHUB_PASS="$DOCKERHUB_PASS"  -e DEPENDENT_DOCKERFILE_URL="$DEPENDENT_DOCKERFILE_URL" -e GITFLOW_BEHAVIOR="TAG_ONLY" eeacms/gitflow'''
          }
        }
      }
