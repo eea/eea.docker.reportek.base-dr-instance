@@ -63,7 +63,7 @@ pipeline {
            sh ''' git clone $GIT_SRC ./'''
            sh ''' curl https://raw.githubusercontent.com/eea/$GIT_NAME.git/src/versions.cfg > src/versions.cfg'''
            sh ''' git add src/versions.cfg'''
-           sh ''' git commit -m "Updated versions.cfg'''
+           sh ''' git commit -m "Updated versions.cfg"'''
            sh ''' git push'''
           }
         }
