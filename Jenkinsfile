@@ -61,7 +61,7 @@ pipeline {
            sh ''' git clone https://$GIT_USER:$GITHUB_TOKEN@github.com/eea/${GIT_NAME}.git ./$GIT_NAME; cd ./$GIT_NAME'''
            sh ''' curl https://raw.githubusercontent.com/eea/$GIT_NAME/develop/src/versions.cfg --output src/versions.cfg'''
            sh ''' git add src/versions.cfg'''
-           sh ''' git commit -m "Updated versions.cfg"; git push'''
+           sh ''' git commit -m "Updated versions.cfg"; echo $GIT_USER; echo $GITHUB_TOKEN; git push'''
            sh ''' cd ..; rm -rf ./$GIT_NAME''' 
           }
         }
