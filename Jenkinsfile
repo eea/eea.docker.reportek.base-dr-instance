@@ -59,7 +59,7 @@ pipeline {
           withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
            sh ''' rm -rf ./$GIT_NAME'''
            sh ''' git clone https://$GIT_USER:$GITHUB_TOKEN@github.com/eea/${GIT_NAME}.git ./$GIT_NAME; cd ./$GIT_NAME'''
-           sh ''' curl https://raw.githubusercontent.com/eea/$GIT_NAME.git/develop/src/versions.cfg --output src/versions.cfg'''
+           sh ''' curl https://raw.githubusercontent.com/eea/$GIT_NAME/develop/src/versions.cfg --output src/versions.cfg'''
            sh ''' git add src/versions.cfg'''
            sh ''' git commit -m "Updated versions.cfg"; git push https://$GIT_USER:$GITHUB_TOKEN@github.com/eea/${GIT_NAME}.git'''
            sh ''' cd ..; rm -rf ./$GIT_NAME''' 
