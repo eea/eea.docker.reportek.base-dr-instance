@@ -12,53 +12,53 @@ pipeline {
  
     stage('Release') {
       when {
-         branch 'develop'
+         branch 'testing'
       }
       steps {
         node(label: 'docker') {
           withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN'), usernamePassword(credentialsId: 'jekinsdockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
-            sh '''docker run -i --rm --name="$BUILD_TAG" -e GIT_BRANCH="develop" -e GIT_NAME="$GIT_NAME" -e DOCKERHUB_REPO="$dockerhubrepo" -e GIT_TOKEN="$GITHUB_TOKEN" -e DOCKERHUB_USER="$DOCKERHUB_USER" -e DOCKERHUB_PASS="$DOCKERHUB_PASS"  -e DEPENDENT_DOCKERFILE_URL="$DEPENDENT_DOCKERFILE_URL" -e GITFLOW_BEHAVIOR="TAG_ONLY" eeacms/gitflow'''
+            sh '''docker run -i --rm --name="$BUILD_TAG" -e GIT_BRANCH="testing" -e GIT_NAME="$GIT_NAME" -e DOCKERHUB_REPO="$dockerhubrepo" -e GIT_TOKEN="$GITHUB_TOKEN" -e DOCKERHUB_USER="$DOCKERHUB_USER" -e DOCKERHUB_PASS="$DOCKERHUB_PASS"  -e DEPENDENT_DOCKERFILE_URL="$DEPENDENT_DOCKERFILE_URL" -e GITFLOW_BEHAVIOR="TAG_ONLY" eeacms/gitflow'''
          }
        }
      }
    }
 
-//    stage('Testing') {
-//      when { 
-//         branch 'develop'
-//      }
-//      steps {
-//        parallel(
-//          
-//          "Coverage": {
-//            node(label: 'docker') {
-//              script {
-//                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-//                  sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/reportek-base-dr-develop coverage'''
-//                }
-//              }
-//            }
-//          },
-//
-//          "Tests": {
-//            node(label: 'docker') {
-//              script {
-//                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-//                  sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/reportek-base-dr-develop tests'''
-//                }
-//              }
-//            }
-//          }
-//        )
-//      }
-//    }  
+    stage('Testing') {
+      when { 
+         branch 'testing'
+      }
+      steps {
+        parallel(
+          
+          "Coverage": {
+            node(label: 'docker') {
+              script {
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                  sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/reportek-base-dr-testing coverage'''
+                }
+              }
+            }
+          },
+
+          "Tests": {
+            node(label: 'docker') {
+              script {
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                  sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/reportek-base-dr-testing tests'''
+                }
+              }
+            }
+          }
+        )
+      }
+    }  
 
      stage('Commit on master') {
       steps {
         node(label: 'docker') {
           withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
            sh ''' rm -rf .git *'''
-           sh ''' git clone https://$GIT_USER:$GITHUB_TOKEN@github.com/eea/${GIT_NAME}.git ./$GIT_NAME; cd ./$GIT_NAME; curl https://raw.githubusercontent.com/eea/$GIT_NAME/develop/src/versions.cfg --output src/versions.cfg; git add src/versions.cfg; git commit -m "Updated versions.cfg"; sed -i "s/null:null/$GIT_USER:$GITHUB_TOKEN/" .git/config; git push'''
+           sh ''' git clone https://$GIT_USER:$GITHUB_TOKEN@github.com/eea/${GIT_NAME}.git ./$GIT_NAME; cd ./$GIT_NAME; curl https://raw.githubusercontent.com/eea/$GIT_NAME/testing/src/versions.cfg --output src/versions.cfg; git add src/versions.cfg; git commit -m "Updated versions.cfg"; sed -i "s/null:null/$GIT_USER:$GITHUB_TOKEN/" .git/config; git push'''
           }
         }
       }
