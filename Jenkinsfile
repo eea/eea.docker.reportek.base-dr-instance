@@ -24,7 +24,7 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                   try {
                   sh '''git clone -b testing https://github.com/eea/eea.docker.reportek.base-dr-instance.git ./'''
-                  sh '''git build -t ${IMAGE_NAME}'''  
+                  sh '''docker build -t ${IMAGE_NAME}'''  
                   sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" $IMAGE_NAME coverage'''                    
                }  finally {
                   sh ''' rm -rf .git *'''  
@@ -42,7 +42,7 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                   try {
                   sh '''git clone -b testing https://github.com/eea/eea.docker.reportek.base-dr-instance.git ./'''
-                  sh '''git build -t ${IMAGE_NAME}'''  
+                  sh '''docker build -t ${IMAGE_NAME}'''  
                   sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" $IMAGE_NAME tests'''                    
                }  finally {
                   sh ''' rm -rf .git *'''  
