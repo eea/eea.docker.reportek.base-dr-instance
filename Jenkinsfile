@@ -35,7 +35,7 @@ pipeline {
             }
           },
 
-          "Coverage": {
+          "Tests": {
             node(label: 'docker') {
               script {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
