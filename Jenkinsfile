@@ -1,7 +1,8 @@
 pipeline {
-  agent any
+  agent {    node { label "docker-host" }    }
 
   environment {
+    IMAGE_NAME = "base-dr-testing"
     GIT_USER = "eea-jenkins"
     GIT_NAME = "eea.docker.reportek.base-dr-instance"
     dockerhubrepo = "eeacms/reportek-base-dr"
@@ -10,19 +11,6 @@ pipeline {
   
   stages {
  
-    stage('Release') {
-      when {
-         branch 'testing'
-      }
-      steps {
-        node(label: 'docker') {
-          withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN'), usernamePassword(credentialsId: 'jekinsdockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
-            sh '''docker run -i --rm --name="$BUILD_TAG" -e GIT_BRANCH="testing" -e GIT_NAME="$GIT_NAME" -e DOCKERHUB_REPO="$dockerhubrepo" -e GIT_TOKEN="$GITHUB_TOKEN" -e DOCKERHUB_USER="$DOCKERHUB_USER" -e DOCKERHUB_PASS="$DOCKERHUB_PASS"  -e DEPENDENT_DOCKERFILE_URL="$DEPENDENT_DOCKERFILE_URL" -e GITFLOW_BEHAVIOR="TAG_ONLY" eeacms/gitflow'''
-         }
-       }
-     }
-   }
-
     stage('Testing') {
       when { 
          branch 'testing'
@@ -34,21 +22,35 @@ pipeline {
             node(label: 'docker') {
               script {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                  sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/reportek-base-dr-testing coverage'''
-                }
+                  try {
+                  sh '''git clone $GIT_SRC'''
+                  sh '''git build -t ${IMAGE_NAME}'''  
+                  sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" $IMAGE_NAME coverage'''                    
+               }  finally {
+                  sh script: "docker rm -v ${IMAGE_NAME}", returnStatus: true
+                  sh script: "docker rmi ${IMAGE_NAME}", returnStatus: true
+               }  
+               }
               }
             }
           },
 
-          "Tests": {
+          "Coverage": {
             node(label: 'docker') {
               script {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                  sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" eeacms/reportek-base-dr-testing tests'''
-                }
+                  try {
+                  sh '''git clone $GIT_SRC'''
+                  sh '''git build -t ${IMAGE_NAME}'''  
+                  sh '''docker run -i --rm --name="$BUILD_TAG-devel" -e GIT_SRC="$GIT_SRC" -e GIT_NAME="$GIT_NAME" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" $IMAGE_NAME tests'''                    
+               }  finally {
+                  sh script: "docker rm -v ${IMAGE_NAME}", returnStatus: true
+                  sh script: "docker rmi ${IMAGE_NAME}", returnStatus: true
+               }  
+               }
               }
             }
-          }
+          },
         )
       }
     }  
