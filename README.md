@@ -33,7 +33,8 @@ See [eeacms/zope](https://hub.docker.com/r/eeacms/zope)
 On top of the environment variables supported by the base [eeacms/zope](https://hub.docker.com/r/eeacms/zope) image, you can also use the following variables which won't trigger a re-run of the buildout process:
 - `ZOPE_THREADS` - default `2`
 - `ZOPE_FAST_LISTEN` - default `off`
-
+- `GRAYLOG` - format `<hostname_or_ip>:<port>`
+- `GRAYLOG_FACILITY`
 
 - `ZOPE_FORCE_CONNECTION_CLOSE` - default `on`
 - `SESSION_MANAGER_TIMEOUT` - in minutes
