@@ -33,7 +33,8 @@ See [eeacms/zope](https://hub.docker.com/r/eeacms/zope)
 On top of the environment variables supported by the base [eeacms/zope](https://hub.docker.com/r/eeacms/zope) image, you can also use the following variables which won't trigger a re-run of the buildout process:
 - `ZOPE_THREADS` - default `2`
 - `ZOPE_FAST_LISTEN` - default `off`
-
+- `GRAYLOG` - format `<hostname_or_ip>:<port>`
+- `GRAYLOG_FACILITY`
 
 - `ZOPE_FORCE_CONNECTION_CLOSE` - default `on`
 - `SESSION_MANAGER_TIMEOUT` - in minutes
@@ -46,8 +47,6 @@ On top of the environment variables supported by the base [eeacms/zope](https://
 - `ZEO_CLIENT_BLOB_CACHE_SIZE` - default `500000000` in bytes
 - `EVENT_LOG_LEVEL` - default `INFO`
 - `ACCESS_LOG_LEVEL` - default `WARN`
-- `SENTRY` - format `'<PROTOCOL>://<PUBLIC_KEY>:<SECRET_KEY>@<HOST>/<PATH><PROJECT_ID>'`
-- `SENTRY_LOG_LEVEL` - default `ERROR`
 - `ZIP_CACHE_ENABLED` - default `true`
 - `ZIP_CACHE_THRESHOLD` - default `100000000` in bytes
 - `ZIP_CACHE_PATH` - default `/opt/zope/var/instance/zip_cache`

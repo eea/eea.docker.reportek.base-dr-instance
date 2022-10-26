@@ -14,8 +14,8 @@ class Environment(object):
         self.fast_listen = self.env.get('ZOPE_FAST_LISTEN', '')
         self.force_connection_close = self.env.get('ZOPE_FORCE_CONNECTION_CLOSE', '')
         self.zope_conf = '/opt/zope/parts/instance/etc/zope.conf'
-        self.sentry = self.env.get('SENTRY', '')
-        self.sentry_log_level = self.env.get('SENTRY_LOG_LEVEL', 'ERROR').upper()
+        self.graylog = self.env.get('GRAYLOG', '')
+        self.facility = self.env.get('GRAYLOG_FACILITY', 'instance')
         self.evt_log_level = self.env.get('EVENT_LOG_LEVEL', 'INFO').upper()
         self.access_log_level = self.env.get('ACCESS_LOG_LEVEL', 'WARN').upper()
         self.session_manager_timeout = self.env.get('SESSION_MANAGER_TIMEOUT', '')
@@ -80,17 +80,18 @@ class Environment(object):
     def zope_log(self):
         """ Zope logging
         """
-        if not self.sentry:
+        if not self.graylog:
             return
 
-        if 'raven.contrib.zope' in self.conf:
-            self.log('Sending logs to sentry: %s', self.sentry)
+        if 'eea.graylogger' in self.conf:
+            self.log('Sending logs to graylog: %s', self.graylog)
             return
 
-        if self.sentry:
-            self.log("Sending logs to sentry: '%s'", self.sentry)
-            sentry_tmpl = SENTRY_TEMPLATE % (self.sentry, self.sentry_log_level)
-            self.conf = "%import raven.contrib.zope\n" + self.conf.replace('</eventlog>', "%s</eventlog>" % sentry_tmpl)
+        if self.graylog:
+            self.log("Sending logs to graylog: '%s' as facility: '%s'",
+                     self.graylog, self.facility)
+            graylog_tmpl = GRAYLOG_TEMPLATE % (self.graylog, self.facility)
+            self.conf = "%import eea.graylogger\n" + self.conf.replace('</logfile>', "</logfile>%s" % graylog_tmpl)
 
     def zope_log_level(self):
         """ Zope log level
@@ -104,13 +105,8 @@ class Environment(object):
                 'eventlog': self.evt_log_level,
                 'logger': self.access_log_level
             }
-            sentry = False
             for line in log_fragment.split('\n'):
-                if '<sentry>' in line:
-                    sentry = True
-                elif '</sentry>' in line:
-                    sentry = False
-                if 'level ' in line and line.split('level')[1].lstrip() != log.get(l_type) and not sentry:
+                if 'level ' in line and line.split('level')[1].lstrip() != log.get(l_type):
                     line = 'level'.join([line.split('level')[0], ' %s' % log.get(l_type)])
                 new_log_fragment.append(line)
             self.conf = self.conf.replace(log_fragment, '\n'.join(new_log_fragment))
@@ -176,12 +172,11 @@ class Environment(object):
 
     __call__ = setup
 
-
-SENTRY_TEMPLATE = """
-    <sentry>
-      dsn %s
-      level %s
-    </sentry>
+GRAYLOG_TEMPLATE = """
+  <graylog>
+    server %s
+    facility %s
+  </graylog>
 """
 
 ZEO_TEMPLATE = """
