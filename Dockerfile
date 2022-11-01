@@ -16,7 +16,7 @@ RUN buildDeps="gcc" \
  && apt-get install -y --no-install-recommends $runDeps \
  && apt-get install -y --no-install-recommends build-essential \
  && echo "zope-www ALL = NOPASSWD: /etc/init.d/cron"  > /etc/sudoers \
- && pip install python-ldap==2.4.38 python-dateutil \
+ && pip install python-ldap==2.4.38 PasteDeploy==2.1.1 python-dateutil \
  && cd $ZOPE_HOME && ./install.sh \
  && chown -R 500:500 $ZOPE_HOME \
  && cd $ZOPE_HOME \
