@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 COMMANDS="debug help logtail show stop adduser fg kill quit run wait console foreground logreopen reload shell status"
 CRONJOB="cronjob"
