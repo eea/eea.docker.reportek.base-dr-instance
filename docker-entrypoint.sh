@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 COMMANDS="debug help logtail show stop adduser fg kill quit run wait console foreground logreopen reload shell status"
 CRONJOB="cronjob"
@@ -49,7 +49,8 @@ else
   if [[ $COMMANDS == *"$1"* ]]; then
     exec $CMD "$@"
   elif [[ $CRONJOB == *"$1"* && ! -z $CRONTAB ]]; then
-    echo "$CRONTAB" > /tmp/crontab
+    /usr/bin/printenv > /tmp/crontab
+    echo "$CRONTAB" >> /tmp/crontab
     # start netcat to keep the healthchecker happy
     nc -lkp 8080 &>/dev/null &
     crontab /tmp/crontab
