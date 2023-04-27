@@ -9,11 +9,12 @@ COPY zope-setup.sh              \
      docker-entrypoint.sh       \
      docker-initialize.py       /
 
-RUN buildDeps="gcc g++" \
- && runDeps="gosu libjpeg62 libopenjp2-7 libtiff5 libxml2 libxslt1.1 lynx netcat poppler-utils rsync wv git-core libsasl2-dev python-dev libldap2-dev libssl-dev curl iputils-ping iproute2 vim cron netcat-openbsd sudo procps" \
+RUN echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.list \
+ && buildDeps="gcc g++" \
+ && runDeps="gosu libjpeg62 libopenjp2-7 libtiff5 libxml2 libxslt1.1 libssl1.1="1.1.0l-1~deb9u1" lynx netcat poppler-utils rsync wv git-core libsasl2-dev python-dev libldap2-dev libssl-dev curl iputils-ping iproute2 vim cron netcat-openbsd sudo procps" \
  && apt-get update \
  && apt-get install -y --no-install-recommends $buildDeps \
- && apt-get install -y --no-install-recommends $runDeps \
+ && apt-get install -y --no-install-recommends --allow-downgrades $runDeps \
  && apt-get install -y --no-install-recommends build-essential \
  && echo "zope-www ALL = NOPASSWD: /etc/init.d/cron"  > /etc/sudoers \
  && pip install python-ldap==2.4.38 PasteDeploy==2.1.1 python-dateutil \
