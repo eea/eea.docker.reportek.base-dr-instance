@@ -11,7 +11,7 @@ COPY zope-setup.sh              \
 
 RUN echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.list \
  && buildDeps="gcc g++" \
- && runDeps="gosu libjpeg62 libopenjp2-7 libtiff5 libxml2 libxslt1.1 libssl1.1="1.1.0l-1~deb9u1" lynx netcat poppler-utils rsync wv git-core libsasl2-dev python-dev libldap2-dev libssl-dev curl iputils-ping iproute2 vim cron netcat-openbsd sudo procps" \
+ && runDeps="gosu libjpeg62 libopenjp2-7 libtiff5 libxml2 libxslt1.1 libssl1.1="1.1.0l-1~deb9u1" lynx netcat poppler-utils rsync wv git-core libsasl2-dev python-dev libldap2-dev libssl-dev curl iputils-ping iproute2 vim cron netcat-openbsd sudo procps openssh-client" \
  && apt-get update \
  && apt-get install -y --no-install-recommends $buildDeps \
  && apt-get install -y --no-install-recommends --allow-downgrades $runDeps \
