@@ -17,7 +17,7 @@ RUN echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.
  && apt-get install -y --no-install-recommends $buildDeps \
  && apt-get install -y --no-install-recommends --allow-downgrades $runDeps \
  && echo "zope-www ALL = NOPASSWD: /etc/init.d/cron"  > /etc/sudoers \
- && pip install python-ldap==2.4.38 PasteDeploy==2.1.1 python-dateutil \
+ && pip install python-ldap==2.4.38 PasteDeploy==2.1.1 pathlib==1.0.1 python-dateutil \
  && cd $ZOPE_HOME && ./install.sh \
  && chown -R 500:500 $ZOPE_HOME \
  && apt-get purge -y --auto-remove $buildDeps \
