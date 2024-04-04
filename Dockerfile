@@ -6,7 +6,6 @@ ENV LOCAL_CONVERTERS_HOST=converter
 USER root
 COPY src/*                      $ZOPE_HOME/
 COPY zope-setup.sh              \
-    debug.sh			\
     docker-entrypoint.sh        \
     docker-initialize.py        /
 
