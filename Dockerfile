@@ -84,6 +84,7 @@ RUN apt-get update && \
     libldap2 \
     libmagic1 \
     libsasl2-2 \
+    netcat-openbsd \
     poppler-utils \
     procps \
     wv && \
