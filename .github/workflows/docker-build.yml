@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: eeacms/reportek-base-dr-instance
+  DOCKER_IMAGE: eeacms/reportek-base-dr
   DOCKER_TAG: z5
 
 jobs:
