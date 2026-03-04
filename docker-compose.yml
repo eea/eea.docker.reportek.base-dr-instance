@@ -1,0 +1,96 @@
+version: '3.8'
+
+# ============================================================================
+# Docker Compose for Reportek Development
+# ============================================================================
+
+services:
+  # ==========================================================================
+  # Zope Instance
+  # ==========================================================================
+  zope:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILDKIT_INLINE_CACHE: 1
+    image: reportek:latest
+    container_name: reportek-zope
+    hostname: reportek
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      - ZOPE_HOME=/opt/zope
+      - ZOPE_USER=zope-www
+      - ZOPE_UID=1000
+      - ZOPE_GID=1000
+      - CONFIG=base.cfg
+      - TZ=Europe/Copenhagen
+      # Beaker Session Middleware Configuration
+      - USE_BEAKER_SESSION=1
+      - REDIS_URL=redis://redis:6379/0
+      - SESSION_SECRET=change_this_secret_in_production
+
+    volumes:
+      # Persistent data
+      - zope-data:/opt/zope/var
+      # Development mode: mount local code
+      - ../data/src/Products.Reportek:/opt/zope/src/Products.Reportek
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    networks:
+      - reportek-network
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ==========================================================================
+  # Redis Cache (optional)
+  # ==========================================================================
+  redis:
+    image: valkey/valkey:8-alpine
+    container_name: reportek-redis
+
+    command: valkey-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+    volumes:
+      - redis-data:/data
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - reportek-network
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  reportek-network:
+    driver: bridge
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  zope-data:
+    driver: local
+  redis-data:
+    driver: local

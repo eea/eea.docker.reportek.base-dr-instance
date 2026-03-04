@@ -1,0 +1,187 @@
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# Core Zope 5 Stack
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+Zope==5.13
+ZODB==6.2
+ZEO==6.1
+AccessControl==7.3
+Acquisition==6.2
+AuthEncoding==6.0
+BTrees==6.3
+Chameleon==4.6.0
+DateTime==6.0
+DocumentTemplate==5.3
+ExtensionClass==6.2
+MultiMapping==5.1
+Paste==3.10.1
+PasteDeploy==3.1.0
+Persistence==5.4
+RestrictedPython==8.1
+WebOb==1.8.9
+WSGIProxy2==0.5.1
+ZConfig==4.3
+persistent==6.5
+transaction==5.0
+waitress==3.0.2
+zExceptions==6.0
+zc.lockfile==4.0
+zodbpickle==4.3
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# Zope Products
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+Products.BTreeFolder2==6.0
+Products.CMFCore==3.8
+Products.ExtendedPathIndex==5.0.0
+Products.GenericSetup==5.1.0
+Products.LDAPMultiPlugins==6.1
+Products.LDAPUserFolder==6.1
+Products.MailHost==6.1
+Products.PluggableAuthService==4.1
+Products.PluginRegistry==3.1
+Products.PythonScripts==5.2
+Products.Sessions==6.2
+Products.SiteErrorLog==7.0
+Products.StandardCacheManagers==6.1
+Products.TemporaryFolder==8.1
+Products.ZCatalog==7.3
+Products.ZODBMountPoint==3.0
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# Zope Components
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+z3c.pt==5.1
+zope.annotation==6.0
+zope.browser==4.0
+zope.browsermenu==6.0
+zope.browserpage==6.0
+zope.browserresource==6.0
+zope.cachedescriptors==6.0
+zope.component==7.1
+zope.configuration==7.0
+zope.container==7.2
+zope.contentprovider==7.0
+zope.contenttype==6.0
+zope.datetime==6.0
+zope.deferredimport==6.1.1
+zope.deprecation==6.0
+zope.dottedname==7.0
+zope.event==6.1
+zope.exceptions==6.0
+zope.filerepresentation==7.0
+zope.globalrequest==3.0
+zope.hookable==8.2
+zope.i18n==6.0
+zope.i18nmessageid==8.2
+zope.interface==8.2
+zope.lifecycleevent==6.0
+zope.location==6.0
+zope.pagetemplate==6.1
+zope.processlifetime==4.0
+zope.proxy==7.1
+zope.ptresource==6.0
+zope.publisher==8.0
+zope.schema==8.1
+zope.security==8.3
+zope.sequencesort==6.0
+zope.site==6.0
+zope.size==6.0
+zope.structuredtext==6.0
+zope.tal==6.0
+zope.tales==7.0
+zope.traversing==6.0
+zope.viewlet==6.0
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# Plone Components
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+plone.keyring==4.0.3
+plone.memoize==3.0.4
+plone.portlets==3.0.3
+plone.protect==5.0.5
+plone.registry==2.0.2
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# ZODB Tools
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+zodbupdate==3.0
+zodbverify==1.2.1
+tempstorage==6.0
+RelStorage==4.2.0
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# Database Drivers
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+psycopg2-binary==2.9.11
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# Caching & Sessions
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+python-memcached==1.62
+redis==7.2.1
+Beaker==1.13.0
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# LDAP
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+python-ldap==3.4.5
+dataflake.fakeldap==4.3
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# five.localsitemanager
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+five.localsitemanager==5.0
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# HTTP & Networking
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+requests==2.32.5
+urllib3==2.6.3
+dnspython==2.8.0
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# Message Queue
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+pika==0.13.1
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# XML & HTML Processing
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+lxml==6.0.2
+beautifulsoup4==4.14.3
+cssselect==1.4.0
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# Utilities
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+cffi==2.0.0
+greenlet==3.3.2
+python-dotenv==1.2.1
+python-dateutil>=2.9.0.post0
+xlwt==1.3.0
+z3c.zcmlhook==3.0
+zipstream==1.1.4
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# Testing
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+zope.testrunner==8.2
+coverage==7.13.4
+mock==5.2.0
+collective.xmltestreport==2.0.2
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# Reportek Specific
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+aenum==3.1.16
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# Monitoring & Error Tracking
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+sentry-sdk==2.53.0
+eventlet==0.40.4
+graypy==2.1.0
+
+eea.sentry==3.1
+# eea.graylogger>=2.0
+# eea.rabbitmq.client>=1.9

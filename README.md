@@ -1,55 +1,190 @@
-# Zope w/ Eionet Data Repository Add-ons ready to run Docker image
+# Zope 5 w/ Eionet Data Repository Add-ons ready to run Docker image
 
-Docker base image for Zope with Eionet Data Repository specific Add-ons and settings available.
+Modern, optimized, and hardened Docker image for Reportek based on Docker Hardened Images (DHI) (`dhi.io/python:3.12-debian13`) and Python 3.12.
 
-### Supported tags and respective Dockerfile links
+## Features
 
-  - `:latest` (default)
+- **Fast Package Installation**: Uses [uv](https://github.com/astral-sh/uv) instead of pip for 10-100x faster Python package installation
+- **Multi-stage Build**: Smaller final image size by separating build and runtime dependencies
+- **Optimized Caching**: Better Docker layer caching for faster rebuilds
+- **Security**: Runs as non-root user with proper permission handling
+- **Health Checks**: Built-in health monitoring
+- **Production Ready**: Includes proper logging, monitoring, and error handling
 
-### Base docker image
+## Quick Start
 
- - [hub.docker.com](https://hub.docker.com/r/eeacms/reportek-base-dr/)
+### Build the Image
 
-### Source code
+```bash
+# Build the image
+docker build -t reportek:latest .
 
-  - [github.com](http://github.com/eea/eea.docker.reportek.base-dr-instance)
+# Or using docker-compose
+docker-compose build
+```
 
-### Installation
+### Run Zope
 
-1. Install [Docker](https://www.docker.com/)
+```bash
+# Using Docker
+docker run -p 8080:8080 reportek:latest
 
-2. Install [Docker Compose](https://docs.docker.com/compose/) (optional)
+# Using docker-compose
+docker-compose up -d
+```
 
-## Usage
+Access Zope at: http://localhost:8080
 
-See [eeacms/zope](https://hub.docker.com/r/eeacms/zope)
+Default credentials: `admin` / `admin`
 
-## Upgrade
+## Running standard profile
 
-    $ docker pull eeacms/reportek-base-dr
+By default the `docker-compose.yml` includes the core Zope instances and a lightweight Valkey (Redis) container to manage session data.
 
-## Supported environment variables
+## Environment Variables
 
-On top of the environment variables supported by the base [eeacms/zope](https://hub.docker.com/r/eeacms/zope) image, you can also use the following variables which won't trigger a re-run of the buildout process:
-- `ZOPE_THREADS` - default `2`
-- `ZOPE_FAST_LISTEN` - default `off`
-- `GRAYLOG` - format `<hostname_or_ip>:<port>`
-- `GRAYLOG_FACILITY`
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ZOPE_HOME` | `/opt/zope` | Zope installation directory |
+| `ZOPE_USER` | `zope-www` | User to run Zope as |
+| `ZOPE_UID` | `1000` | UID for Zope user |
+| `ZOPE_GID` | `1000` | GID for Zope group |
+| `ZOPE_ADMIN_USER` | `admin` | Initial admin username |
+| `ZOPE_ADMIN_PASSWORD` | `admin` | Initial admin password |
+| `USE_BEAKER_SESSION` | `1` | Enables Beaker WSGI middleware for session management |
+| `REDIS_URL` | `redis://redis:6379/0` | Redis connection string (Currently used for Beaker sessions) |
+| `SESSION_SECRET` | `secret_key` | Secret used for signing session cookies |
+| `RELSTORAGE_DSN` | *(empty)* | If provided, connects ZODB to a RelStorage backend (e.g. `dbname='reportek'...`) |
+| `ZEO_ADDRESS` | *(empty)* | If set (e.g. `zeo:8100`), Zope connects to this ZEO server instead of using local FileStorage |
+| `ZEO_SHARED_BLOB_DIR` | `off` | Declares if the blob directory is natively shared with a ZEO server volume mount (`on` / `off`) |
+| `ZODB_CACHE_SIZE` | `50000` | Size of the ZODB cache for the main database |
+| `ZOPE_THREADS` | `4` | Number of threads to use in the Waitress WSGI server |
+| `ZOPE_DEBUG_MODE` | `off` | Toggles the Zope application debug mode (`on`, `off`) |
+| `ZOPE_VERBOSE_SECURITY` | `off` | Toggles verbose security exceptions inside Zope (`on`, `off`) |
+| `EVENT_LOG_LEVEL` | `INFO` | The root logging level for Zope/Waitress applications (`INFO`, `DEBUG`, `WARN`, `ERROR`) |
+| `ACCESS_LOG_LEVEL` | `WARN` | The WSGI access logging level (`INFO`, `WARN`, `ERROR`) |
+| `UNS_NOTIFICATIONS` | *(empty)*| Toggles the Unified Notification System (e.g. `on`) |
+| `REPORTEK_DEPLOYMENT` | *(empty)*| Specifies environment (e.g. `CDR`, `BDR`) |
+| `DATADICTIONARY_SCHEMAS_URL` | *(empty)* | Custom URL for EIONET DD validation |
 
-- `ZOPE_FORCE_CONNECTION_CLOSE` - default `on`
-- `SESSION_MANAGER_TIMEOUT` - in minutes
-- `ZEO_ADDRESS` - format `<hostname_or_ip>:<port>`
-- `ZEO_READ_ONLY` - default `false`
-- `ZEO_CLIENT_READ_ONLY_FALLBACK` - default `false`
-- `ZEO_SHARED_BLOB_DIR` - default `off`
-- `ZEO_STORAGE` - default `1`
-- `ZEO_CLIENT_CACHE_SIZE` - default `128MB`
-- `ZEO_CLIENT_BLOB_CACHE_SIZE` - default `500000000` in bytes
-- `EVENT_LOG_LEVEL` - default `INFO`
-- `ACCESS_LOG_LEVEL` - default `WARN`
-- `ZIP_CACHE_ENABLED` - default `true`
-- `ZIP_CACHE_THRESHOLD` - default `100000000` in bytes
-- `ZIP_CACHE_PATH` - default `/opt/zope/var/instance/zip_cache`
+## Available Commands
+
+```bash
+# Start Zope in foreground mode
+docker run reportek:latest fg
+
+# Start Zope console
+docker run -it reportek:latest console
+
+# Run zopepy script
+docker run reportek:latest zopepy /path/to/script.py
+
+# Start bash shell
+docker run -it reportek:latest shell
+
+# Show help
+docker run reportek:latest help
+```
+
+## Development Mode
+
+Mount your local code for development:
+
+```yaml
+# Uncomment in docker-compose.yml
+volumes:
+  - ./src/Products.Reportek:/opt/zope/src/Products.Reportek
+```
+
+Then restart the container to pick up changes:
+
+```bash
+docker-compose restart zope
+```
+
+## Volumes
+
+The image uses volumes for persistent data:
+
+- `zope-data`: Zope var directory (Data.fs, logs, etc.)
+- `redis-data`: Redis cache data
+
+### Backup Data
+
+```bash
+# Backup Zope data
+docker run --rm \
+  -v reportek_zope-data:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/zope-data-$(date +%Y%m%d).tar.gz -C /data .
+```
+
+### Restore Data
+
+```bash
+# Restore Zope data
+docker run --rm \
+  -v reportek_zope-data:/data \
+  -v $(pwd):/backup \
+  alpine tar xzf /backup/zope-data-YYYYMMDD.tar.gz -C /data
+```
+
+### Clean rebuild
+
+Remove all containers and volumes:
+```bash
+docker-compose down -v
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+## Performance Tuning
+
+### For Development
+```yaml
+# docker-compose.override.yml
+services:
+  zope:
+    environment:
+      - ZOPE_DEBUG_MODE=on
+    command: fg  # Run in foreground for logs
+```
+
+### For Production
+```yaml
+services:
+  zope:
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+```
+
+## Maintenance
+
+### Update Base Image
+
+```bash
+docker pull python:3.8-slim-bookworm
+docker-compose build --pull
+```
+
+### Update Dependencies
+
+Edit `requirements.txt` and rebuild:
+```bash
+docker-compose build --no-cache
+```
+
+### Security Scanning
+
+```bash
+docker scan reportek:latest
+```
 
 ## Copyright and license
 
@@ -65,5 +200,3 @@ version.
 ## Funding
 
 [European Environment Agency (EU)](http://eea.europa.eu)
-
-

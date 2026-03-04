@@ -1,0 +1,18 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:five="http://namespaces.zope.org/five">
+
+    <!-- Load Zope's default configuration -->
+    <include package="Zope2.App" file="meta.zcml" />
+    <include package="Zope2.App" />
+
+    <!-- Products -->
+    <include package="Products.Reportek" />
+
+    <!-- Plone components -->
+    <include package="plone.keyring" />
+    <include package="plone.protect" />
+
+    <!-- Monitoring -->
+    <include package="eea.sentry" />
+
+</configure>
