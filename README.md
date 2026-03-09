@@ -4,12 +4,12 @@ Modern, optimized, and hardened Docker image for Reportek based on Docker Harden
 
 ## Features
 
-- **Fast Package Installation**: Uses [uv](https://github.com/astral-sh/uv) instead of pip for 10-100x faster Python package installation
-- **Multi-stage Build**: Smaller final image size by separating build and runtime dependencies
-- **Optimized Caching**: Better Docker layer caching for faster rebuilds
-- **Security**: Runs as non-root user with proper permission handling
-- **Health Checks**: Built-in health monitoring
-- **Production Ready**: Includes proper logging, monitoring, and error handling
+- **Fast Package Installation**: Uses [uv](https://github.com/astral-sh/uv) instead of pip for 10-100x faster Python package installation.
+- **Multi-stage Build**: Smaller final image size by separating build and runtime dependencies.
+- **Optimized Caching**: Better Docker layer caching for faster rebuilds.
+- **Security**: Runs as non-root user with proper permission handling.
+- **Health Checks**: Built-in health monitoring.
+- **Production Ready**: Includes proper logging, monitoring, and error handling.
 
 ## Quick Start
 
