@@ -100,6 +100,10 @@ plone.memoize==3.0.4
 plone.portlets==3.0.3
 plone.protect==5.0.5
 plone.registry==2.0.2
+plone.session==4.0.6
+plone.i18n==4.0.7
+plone.supermodel==2.0.4
+Unidecode==1.3.8
 
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
 # ZODB Tools
@@ -126,6 +130,26 @@ Beaker==1.13.0
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
 python-ldap==3.4.5
 dataflake.fakeldap==4.3
+pas.plugins.ldap==1.8.4
+Products.PlonePAS==6.0.8
+node.ext.ldap==2.0.0
+node.ext.ugm==2.0.0
+node==2.0.0
+odict==2.0.0
+plumber==2.0.0
+bda.cache==1.3.0
+passlib==1.7.4
+
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+# YAFOWIL (for pas.plugins.ldap ZMI config UI, without yafowil.plone)
+# >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
+yafowil==4.0.0
+yafowil.yaml==3.0.0
+yafowil.bootstrap==2.0.0
+yafowil.widget.array==2.0.0
+yafowil.widget.dict==2.0.0
+webresource==2.0.0
+PyYAML==6.0.2
 
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
 # five.localsitemanager

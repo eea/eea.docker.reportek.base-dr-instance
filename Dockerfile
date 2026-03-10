@@ -40,7 +40,13 @@ RUN uv venv $ZOPE_HOME
 
 # Copy and install requirements
 COPY requirements.txt $ZOPE_HOME/
-RUN uv pip install --python=$ZOPE_HOME/bin/python -r $ZOPE_HOME/requirements.txt
+RUN uv pip install --python=$ZOPE_HOME/bin/python -r $ZOPE_HOME/requirements.txt && \
+    # Patch PlonePAS to use Image.LANCZOS instead of Image.ANTIALIAS (removed in recent versions of Pillow)
+    sed -i 's/Image\.ANTIALIAS/Image.LANCZOS/g' \
+        $ZOPE_HOME/lib/python3.12/site-packages/Products/PlonePAS/config.py && \
+    # Patch pas.plugins.ldap to close the <link>
+    sed -i 's|></link>|/>|g' \
+        $ZOPE_HOME/lib/python3.12/site-packages/pas/plugins/ldap/zmi/manage_plugin.pt
 
 # Clone and install Products.Reportek from git
 RUN git clone --branch wip_migration_to_zope4_5_py3 --single-branch \
@@ -84,7 +90,6 @@ RUN apt-get update && \
     libldap2 \
     libmagic1 \
     libsasl2-2 \
-    netcat-openbsd \
     poppler-utils \
     procps \
     wv && \
@@ -98,6 +103,7 @@ RUN groupadd -g ${ZOPE_GID} zope-www && \
 RUN mkdir -p /etc/ldap && \
     echo "TLS_CACERT /etc/ssl/certs/ca-certificates.crt" > /etc/ldap/ldap.conf && \
     echo "REFERRALS off" >> /etc/ldap/ldap.conf
+
 # Copy installation from builder
 COPY --from=builder --chown=${ZOPE_UID}:${ZOPE_GID} $ZOPE_HOME $ZOPE_HOME
 
