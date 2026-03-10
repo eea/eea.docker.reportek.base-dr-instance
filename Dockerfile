@@ -96,8 +96,8 @@ RUN groupadd -g ${ZOPE_GID} zope-www && \
 
 # Configure OpenLDAP
 RUN mkdir -p /etc/ldap && \
-    echo "TLS_CACERT /etc/ssl/certs/ca-certificates.crt\nREFERRALS off" > /etc/ldap/ldap.conf
-
+    echo "TLS_CACERT /etc/ssl/certs/ca-certificates.crt" > /etc/ldap/ldap.conf && \
+    echo "REFERRALS off" >> /etc/ldap/ldap.conf
 # Copy installation from builder
 COPY --from=builder --chown=${ZOPE_UID}:${ZOPE_GID} $ZOPE_HOME $ZOPE_HOME
 
