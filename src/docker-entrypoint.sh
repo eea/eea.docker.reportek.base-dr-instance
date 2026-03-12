@@ -242,11 +242,11 @@ main() {
             log "Running coverage tracking exclusively over Products.Reportek"
             cd $ZOPE_HOME/src/Products.Reportek
             if [ "$(id -u)" = "0" ]; then
-                gosu $ZOPE_USER $ZOPE_HOME/bin/coverage run $ZOPE_HOME/bin/zope-testrunner --test-path $(pwd) -v -vv -s Products.Reportek
-                gosu $ZOPE_USER $ZOPE_HOME/bin/coverage xml --include=*Products.Reportek*
+                gosu $ZOPE_USER $ZOPE_HOME/bin/coverage run $ZOPE_HOME/bin/zope-testrunner --test-path $(pwd) -v -vv -s Products.Reportek --xml testreports
+                gosu $ZOPE_USER $ZOPE_HOME/bin/coverage xml --include='*/Products/Reportek/*'
             else
-                $ZOPE_HOME/bin/coverage run $ZOPE_HOME/bin/zope-testrunner --test-path $(pwd) -v -vv -s Products.Reportek
-                $ZOPE_HOME/bin/coverage xml --include=*Products.Reportek*
+                $ZOPE_HOME/bin/coverage run $ZOPE_HOME/bin/zope-testrunner --test-path $(pwd) -v -vv -s Products.Reportek --xml testreports
+                $ZOPE_HOME/bin/coverage xml --include='*/Products/Reportek/*'
             fi
             exit 0
             ;;
