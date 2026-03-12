@@ -239,14 +239,15 @@ main() {
             ;;
 
         coverage)
-            log "Running coverage tracking exclusively over Products.Reportek"
-            cd $ZOPE_HOME/src/Products.Reportek
+            TARGET_PKG="${GIT_NAME:-Products.Reportek}"
+            log "Running coverage tracking exclusively over $TARGET_PKG"
+            cd $ZOPE_HOME/src/$TARGET_PKG
             if [ "$(id -u)" = "0" ]; then
-                gosu $ZOPE_USER $ZOPE_HOME/bin/coverage run $ZOPE_HOME/bin/zope-testrunner --test-path $(pwd) -v -vv -s Products.Reportek --xml testreports
-                gosu $ZOPE_USER $ZOPE_HOME/bin/coverage xml --include='*/Products/Reportek/*'
+                gosu $ZOPE_USER $ZOPE_HOME/bin/coverage run $ZOPE_HOME/bin/zope-testrunner --test-path $(pwd) -v -vv -s $TARGET_PKG --xml testreports
+                gosu $ZOPE_USER $ZOPE_HOME/bin/coverage xml -i --include="*/$TARGET_PKG/*"
             else
-                $ZOPE_HOME/bin/coverage run $ZOPE_HOME/bin/zope-testrunner --test-path $(pwd) -v -vv -s Products.Reportek --xml testreports
-                $ZOPE_HOME/bin/coverage xml --include='*/Products/Reportek/*'
+                $ZOPE_HOME/bin/coverage run $ZOPE_HOME/bin/zope-testrunner --test-path $(pwd) -v -vv -s $TARGET_PKG --xml testreports
+                $ZOPE_HOME/bin/coverage xml -i --include="*/$TARGET_PKG/*"
             fi
             exit 0
             ;;
