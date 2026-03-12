@@ -243,10 +243,10 @@ main() {
             log "Running coverage tracking exclusively over $TARGET_PKG"
             cd $ZOPE_HOME/src/$TARGET_PKG
             if [ "$(id -u)" = "0" ]; then
-                gosu $ZOPE_USER $ZOPE_HOME/bin/coverage run $ZOPE_HOME/bin/zope-testrunner --test-path $(pwd) -v -vv -s $TARGET_PKG --xml $(pwd)/testreports
+                gosu $ZOPE_USER $ZOPE_HOME/bin/coverage run $ZOPE_HOME/bin/zope-testrunner --test-path $(pwd) -v -vv -s $TARGET_PKG --xml=$(pwd)
                 gosu $ZOPE_USER $ZOPE_HOME/bin/coverage xml -i --include="*/$TARGET_PKG/*"
             else
-                $ZOPE_HOME/bin/coverage run $ZOPE_HOME/bin/zope-testrunner --test-path $(pwd) -v -vv -s $TARGET_PKG --xml $(pwd)/testreports
+                $ZOPE_HOME/bin/coverage run $ZOPE_HOME/bin/zope-testrunner --test-path $(pwd) -v -vv -s $TARGET_PKG --xml=$(pwd)
                 $ZOPE_HOME/bin/coverage xml -i --include="*/$TARGET_PKG/*"
             fi
             exit 0

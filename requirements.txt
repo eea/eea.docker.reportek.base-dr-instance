@@ -192,7 +192,6 @@ zipstream==1.1.4
 zope.testrunner==8.2
 coverage==7.13.4
 mock==5.2.0
-collective.xmltestreport==2.0.2
 
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
 # Reportek Specific
