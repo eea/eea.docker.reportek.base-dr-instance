@@ -49,7 +49,7 @@ RUN uv pip install --python=$ZOPE_HOME/bin/python -r $ZOPE_HOME/requirements.txt
         $ZOPE_HOME/lib/python3.12/site-packages/pas/plugins/ldap/zmi/manage_plugin.pt
 
 # Clone and install Products.Reportek from git
-RUN git clone --branch wip_migration_to_zope4_5_py3 --single-branch \
+RUN git clone --branch z5 --single-branch \
     https://github.com/eea/Products.Reportek.git $ZOPE_HOME/src/Products.Reportek && \
     rm -rf $ZOPE_HOME/src/Products.Reportek/.git && \
     uv pip install --python=$ZOPE_HOME/bin/python -e $ZOPE_HOME/src/Products.Reportek
