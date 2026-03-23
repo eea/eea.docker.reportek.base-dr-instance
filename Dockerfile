@@ -40,19 +40,15 @@ RUN uv venv $ZOPE_HOME
 
 # Copy and install requirements
 COPY requirements.txt $ZOPE_HOME/
-RUN uv pip install --python=$ZOPE_HOME/bin/python -r $ZOPE_HOME/requirements.txt && \
+RUN uv pip install --python=$ZOPE_HOME/bin/python \
+        --find-links https://eggrepo.eea.europa.eu/simple/ \
+        -r $ZOPE_HOME/requirements.txt && \
     # Patch PlonePAS to use Image.LANCZOS instead of Image.ANTIALIAS (removed in recent versions of Pillow)
     sed -i 's/Image\.ANTIALIAS/Image.LANCZOS/g' \
         $ZOPE_HOME/lib/python3.12/site-packages/Products/PlonePAS/config.py && \
     # Patch pas.plugins.ldap to close the <link>
     sed -i 's|></link>|/>|g' \
         $ZOPE_HOME/lib/python3.12/site-packages/pas/plugins/ldap/zmi/manage_plugin.pt
-
-# Clone and install Products.Reportek from git
-RUN git clone --branch z5 --single-branch \
-    https://github.com/eea/Products.Reportek.git $ZOPE_HOME/src/Products.Reportek && \
-    rm -rf $ZOPE_HOME/src/Products.Reportek/.git && \
-    uv pip install --python=$ZOPE_HOME/bin/python -e $ZOPE_HOME/src/Products.Reportek
 
 # Create directory structure
 RUN mkdir -p $ZOPE_HOME/etc \
