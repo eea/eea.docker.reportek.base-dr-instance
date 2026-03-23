@@ -82,6 +82,8 @@ ENV ZIP_CACHE_PATH=${ZOPE_HOME}/var
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     cron \
+    curl \
+    git \
     gosu \
     libldap2 \
     libmagic1 \
