@@ -210,4 +210,4 @@ graypy==2.1.0
 
 eea.sentry==3.1
 # eea.graylogger>=2.0
-products-reportek==100.1.0
+products-reportek==100.2.0
