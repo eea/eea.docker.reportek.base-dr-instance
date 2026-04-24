@@ -3,7 +3,7 @@
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
 # Core Zope 5 Stack
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
-Zope==5.13
+Zope==5.14
 ZODB==6.2
 ZEO==6.1
 AccessControl==7.3
@@ -68,7 +68,7 @@ zope.contenttype==6.0
 zope.datetime==6.0
 zope.deferredimport==6.1.1
 zope.deprecation==6.0
-zope.dottedname==7.0
+zope.dottedname==7.1
 zope.event==6.1
 zope.exceptions==6.0
 zope.filerepresentation==7.0
