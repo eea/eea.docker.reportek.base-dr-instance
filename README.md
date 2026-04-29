@@ -57,6 +57,9 @@ By default the `docker-compose.yml` includes the core Zope instances and a light
 | `RELSTORAGE_DSN` | *(empty)* | If provided, connects ZODB to a RelStorage backend (e.g. `dbname='reportek'...`) |
 | `ZEO_ADDRESS` | *(empty)* | If set (e.g. `zeo:8100`), Zope connects to this ZEO server instead of using local FileStorage |
 | `ZEO_SHARED_BLOB_DIR` | `off` | Declares if the blob directory is natively shared with a ZEO server volume mount (`on` / `off`) |
+| `ZEO_CLIENT_CACHE_SIZE` | `128MB` | ZEO client object cache size (e.g. `128MB`, `512MB`). Only applied when `ZEO_ADDRESS` is set |
+| `ZEO_CLIENT_BLOB_CACHE_SIZE` | *(unset)* | ZEO client local blob cache size (e.g. `1GB`). Only meaningful when `ZEO_ADDRESS` is set and `ZEO_SHARED_BLOB_DIR=off`; omitted from
+         +config when unset |
 | `ZODB_CACHE_SIZE` | `50000` | Size of the ZODB cache for the main database |
 | `ZOPE_THREADS` | `4` | Number of threads to use in the Waitress WSGI server |
 | `ZOPE_DEBUG_MODE` | `off` | Toggles the Zope application debug mode (`on`, `off`) |

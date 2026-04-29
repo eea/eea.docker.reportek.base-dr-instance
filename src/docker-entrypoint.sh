@@ -81,6 +81,11 @@ setup_zodb() {
     local zodb_conf="$ZOPE_HOME/etc/zodb.conf"
     local cache_size=${ZODB_CACHE_SIZE:-50000}
     local shared_blob_dir=${ZEO_SHARED_BLOB_DIR:-off}
+    local zeo_client_cache_size=${ZEO_CLIENT_CACHE_SIZE:-128MB}
+    local zeo_blob_cache_line=""
+    if [ -n "$ZEO_CLIENT_BLOB_CACHE_SIZE" ]; then
+        zeo_blob_cache_line="        blob-cache-size $ZEO_CLIENT_BLOB_CACHE_SIZE"
+    fi
 
     log "Generating ZODB configuration at $zodb_conf"
 
@@ -100,7 +105,7 @@ setup_zodb() {
 </zodb_db>
 EOF
     elif [ -n "$ZEO_ADDRESS" ]; then
-        log "ZEO_ADDRESS is set to $ZEO_ADDRESS. Configuring ZEO Client..."
+        log "ZEO_ADDRESS is set to $ZEO_ADDRESS. Configuring ZEO Client (cache-size=$zeo_client_cache_size${ZEO_CLIENT_BLOB_CACHE_SIZE:+, blob-cache-size=$ZEO_CLIENT_BLOB_CACHE_SIZE})..."
         cat <<EOF > "$zodb_conf"
 <zodb_db main>
     cache-size $cache_size
@@ -109,10 +114,11 @@ EOF
         storage 1
         name zeostorage
         var $ZOPE_HOME/var
-        cache-size 128MB
+        cache-size $zeo_client_cache_size
         blob-dir $ZOPE_HOME/var/blobstorage
         shared-blob-dir $shared_blob_dir
-    </zeoclient>
+${zeo_blob_cache_line:+$zeo_blob_cache_line
+}    </zeoclient>
     mount-point /
 </zodb_db>
 EOF
