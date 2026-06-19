@@ -4,7 +4,7 @@ pipeline {
   environment {
     GIT_NAME = "eea.docker.reportek.base-dr-instance"
     dockerhubrepo = "eeacms/reportek-base-dr"
-    DEPENDENT_DOCKERFILE_URL="eea/eea.docker.reportek.mdr-instance/blob/master/Dockerfile eea/eea.docker.reportek.cdr-instance/blob/master/Dockerfile eea/eea.docker.reportek.bdr-instance/blob/master/Dockerfile"
+    DEPENDENT_DOCKERFILE_URL="eea/eea.docker.reportek.cdr-instance/blob/master/Dockerfile eea/eea.docker.reportek.bdr-instance/blob/master/Dockerfile"
   }
 
   stages {
