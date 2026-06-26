@@ -41,6 +41,7 @@ RUN uv venv $ZOPE_HOME
 # Copy and install requirements
 COPY requirements.txt $ZOPE_HOME/
 RUN uv pip install --python=$ZOPE_HOME/bin/python \
+        --index-url https://pypi.org/simple \
         --find-links https://eggrepo.eea.europa.eu/simple/ \
         -r $ZOPE_HOME/requirements.txt && \
     # Patch PlonePAS to use Image.LANCZOS instead of Image.ANTIALIAS (removed in recent versions of Pillow)
