@@ -1,7 +1,8 @@
 FROM eeacms/zope:2.13.30
-MAINTAINER "EEA: IDM2 C-TEAM" <eea-edw-c-team-alerts@googlegroups.com>
 
 ENV LOCAL_CONVERTERS_HOST=converter
+
+ENV REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 
 USER root
 COPY src/*                      $ZOPE_HOME/
@@ -16,6 +17,15 @@ RUN echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.
     && apt-get update \
     && apt-get install -y --no-install-recommends $buildDeps \
     && apt-get install -y --no-install-recommends --allow-downgrades $runDeps \
+    && CA_DEB=ca-certificates_20260601_all.deb \
+    && curl -fsSLo /tmp/$CA_DEB "http://snapshot.debian.org/archive/debian/20260601T202527Z/pool/main/c/ca-certificates/$CA_DEB" \
+    && echo "3269df8178f5402093a57c754810f8ce59e1a0cf9361aa72252bf3186cfc32d7  /tmp/$CA_DEB" | sha256sum -c - \
+    && dpkg-deb -x /tmp/$CA_DEB /tmp/ca-new \
+    && rm -rf /usr/share/ca-certificates/mozilla \
+    && cp -r /tmp/ca-new/usr/share/ca-certificates/mozilla /usr/share/ca-certificates/ \
+    && (cd /usr/share/ca-certificates && find . -name '*.crt' | sed 's|^\./||' | sort) > /etc/ca-certificates.conf \
+    && update-ca-certificates --fresh \
+    && rm -rf /tmp/$CA_DEB /tmp/ca-new \
     && echo "zope-www ALL = NOPASSWD: /etc/init.d/cron"  > /etc/sudoers \
     && pip install python-ldap==2.4.38 PasteDeploy==2.1.1 pathlib==1.0.1 python-dateutil Paste==3.6.1 \
     && cd $ZOPE_HOME && ./install.sh \
