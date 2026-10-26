@@ -10,12 +10,14 @@ pipeline {
   environment {
     // per-build docker config, so the dhi.io login is not written to the agent's shared ~/.docker
     DOCKER_CONFIG = "${WORKSPACE}/.docker"
+    // BUILD_TAG has %2f for a / in the branch name, keep only what docker accepts in tags and names
+    SAFE_BUILD_TAG = "${env.BUILD_TAG.toLowerCase().replaceAll('[^a-z0-9_.-]', '-')}"
     GIT_NAME = "eea.docker.reportek.base-dr-instance"
     GIT_USER = "eea-jenkins"
     DOCKERHUB_REPO = "eeacms/reportek-base-dr"
-    GITFLOW_CONTAINER = "${env.BUILD_TAG.toLowerCase()}-gitflow"
-    TEST_IMAGE = "base-dr-testing:${env.BUILD_TAG.toLowerCase()}"
-    TEST_CONTAINER = "${env.BUILD_TAG.toLowerCase()}-tests"
+    GITFLOW_CONTAINER = "${SAFE_BUILD_TAG}-gitflow"
+    TEST_IMAGE = "base-dr-testing:${SAFE_BUILD_TAG}"
+    TEST_CONTAINER = "${SAFE_BUILD_TAG}-tests"
   }
 
   stages {
