@@ -103,7 +103,7 @@ pipeline {
             try {
               sh '''
                 set -e
-                git fetch --tags --force -q
+                git fetch -q --force "https://github.com/eea/$GIT_NAME.git" "refs/tags/*:refs/tags/*"
                 if [ -n "$(git tag --points-at HEAD)" ]; then
                   echo "This commit is already released as $(git tag --points-at HEAD | head -n 1), nothing to do"
                   exit 0
