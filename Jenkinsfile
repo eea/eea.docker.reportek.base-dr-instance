@@ -103,6 +103,7 @@ pipeline {
             try {
               sh '''
                 set -e
+                rm -f .released-version
                 git fetch -q --force "https://github.com/eea/$GIT_NAME.git" "refs/tags/*:refs/tags/*"
                 if [ -n "$(git tag --points-at HEAD)" ]; then
                   echo "This commit is already released as $(git tag --points-at HEAD | head -n 1), nothing to do"
@@ -110,6 +111,7 @@ pipeline {
                 fi
                 VERSION=$(./src/docker/calculate_next_release.sh)
                 echo "Releasing $DOCKERHUB_REPO:$VERSION"
+                echo "$VERSION" > .released-version
                 printf '%s' "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
                 docker tag "$TEST_IMAGE" "$DOCKERHUB_REPO:$VERSION"
                 docker tag "$TEST_IMAGE" "$DOCKERHUB_REPO:latest"
@@ -122,6 +124,40 @@ pipeline {
               sh '''docker logout || true'''
             }
           }
+        }
+      }
+    }
+
+    // cdr and bdr follow the base image: point their Dockerfile to the version that was just released,
+    // their own master build then releases them. Only runs when the Release stage published a version.
+    stage('Bump dependents') {
+      when {
+        allOf {
+          branch 'master'
+          expression { fileExists('.released-version') }
+        }
+      }
+      steps {
+        withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
+          sh '''
+            set -e
+            set +x
+            VERSION=$(cat .released-version)
+            for repo in eea.docker.reportek.cdr-instance eea.docker.reportek.bdr-instance; do
+              rm -rf "dependent-$repo"
+              git clone --branch master "https://$GIT_USER:$GITHUB_TOKEN@github.com/eea/$repo.git" "dependent-$repo"
+              cd "dependent-$repo"
+              sed -i -E "/^FROM .*eeacms[/]reportek-base-dr:/ s#eeacms/reportek-base-dr:[^ ]+#eeacms/reportek-base-dr:$VERSION#" Dockerfile
+              if git diff --quiet -- Dockerfile; then
+                echo "$repo already uses $VERSION, nothing to bump"
+              else
+                git add Dockerfile
+                git commit -m "Bump the base image to $VERSION"
+                git push origin HEAD:master
+              fi
+              cd ..
+            done
+          '''
         }
       }
     }
