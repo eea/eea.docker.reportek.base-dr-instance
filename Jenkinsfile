@@ -1,3 +1,17 @@
+def notifyBuild() {
+  def details = """<h1>${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}</h1>
+                   <p>Check console output at <a href="${env.BUILD_URL}/display/redirect">${env.JOB_BASE_NAME} - #${env.BUILD_NUMBER}</a></p>
+                """
+  emailext(
+  subject: '$DEFAULT_SUBJECT',
+  body: details,
+  attachLog: true,
+  compressLog: true,
+  to: 'eea-edw-c-team-alerts@googlegroups.com',
+  recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'CulpritsRecipientProvider']]
+  )
+}
+
 pipeline {
   agent {
     node { label 'docker-host' }
@@ -5,6 +19,8 @@ pipeline {
 
   options {
     disableConcurrentBuilds()
+    timeout(time: 90, unit: 'MINUTES')
+    buildDiscarder(logRotator(numToKeepStr: '20'))
   }
 
   environment {
@@ -15,14 +31,27 @@ pipeline {
     GIT_NAME = "eea.docker.reportek.base-dr-instance"
     GIT_USER = "eea-jenkins"
     DOCKERHUB_REPO = "eeacms/reportek-base-dr"
-    GITFLOW_CONTAINER = "${SAFE_BUILD_TAG}-gitflow"
+    // a release is a tag in this form: <Zope minor>-<N>, ex: 5.14-3
+    TAG_PATTERN = '^[0-9]+[.][0-9]+-[0-9]+$'
+    // pinned, the scan results should not change because the scanner did
+    TRIVY_IMAGE = "aquasec/trivy:0.76.0"
     TEST_IMAGE = "base-dr-testing:${SAFE_BUILD_TAG}"
     TEST_CONTAINER = "${SAFE_BUILD_TAG}-tests"
   }
 
+  // How a release happens:
+  //  1. a commit on testing is built and tested
+  //  2. Promote to master copies requirements.txt to master and creates the GitHub release (and its tag)
+  //  3. the tag is built and tested again, then Release publishes <zope>-<N> and latest to Docker Hub
+  //  4. Bump dependents points cdr and bdr to the new image, and releases them the same way
+  // Commits made directly on master are built and tested, but not released until they are tagged.
+  // Tags that are not a release (ex: the old z5-*) are ignored.
   stages {
 
     stage('Build image') {
+      when {
+        expression { !env.TAG_NAME || env.TAG_NAME ==~ env.TAG_PATTERN }
+      }
       steps {
         withCredentials([usernamePassword(credentialsId: 'jekinsdockerhub', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
           script {
@@ -30,7 +59,7 @@ pipeline {
               // the Dockerfile pulls its base images from dhi.io (Docker Hardened Images)
               sh '''
                 printf '%s' "$DOCKERHUB_PASSWORD" | docker login dhi.io -u "$DOCKERHUB_USERNAME" --password-stdin
-                docker build --no-cache --platform=linux/amd64 -t "$TEST_IMAGE" .
+                docker build --no-cache --platform=linux/amd64 --label "org.opencontainers.image.revision=$GIT_COMMIT" --label "org.opencontainers.image.source=https://github.com/eea/$GIT_NAME" --label "org.opencontainers.image.version=${TAG_NAME:-$BRANCH_NAME}" -t "$TEST_IMAGE" .
               '''
             } finally {
               sh '''docker logout dhi.io || true'''
@@ -45,6 +74,9 @@ pipeline {
     // so it always exits 0. Run the test runner directly against the installed package instead.
 
     stage('Tests') {
+      when {
+        expression { !env.TAG_NAME || env.TAG_NAME ==~ env.TAG_PATTERN }
+      }
       steps {
         script {
           def rc = 1
@@ -64,8 +96,60 @@ pipeline {
       }
     }
 
-    // Promote only what the tests above verified: requirements.txt. The push to master
-    // triggers the normal master build (release, tag and image).
+    // Start the image that was just built and check that it serves, before anything is published.
+    stage('Smoke test') {
+      when {
+        expression { !env.TAG_NAME || env.TAG_NAME ==~ env.TAG_PATTERN }
+      }
+      steps {
+        sh '''SMOKE_PLATFORM=linux/amd64 ./test/smoke.sh "$TEST_IMAGE" requirements.txt'''
+      }
+    }
+
+    // Trivy, on the image that was just built. Fixable CRITICAL vulnerabilities fail the build, the HIGH ones are only
+    // listed (some of them are not fixed upstream, and there are fixable ones today). Findings can be accepted in
+    // a .trivyignore file in the root of the repository. When the scan cannot run (ex: the vulnerability database
+    // cannot be downloaded) the build is marked unstable, a Docker Hub or ghcr.io outage should not block a release.
+    // The image is scanned from a tar file, so the Docker socket is not given to the scanner.
+    stage('Scan image') {
+      when {
+        expression { !env.TAG_NAME || env.TAG_NAME ==~ env.TAG_PATTERN }
+      }
+      options {
+        timeout(time: 15, unit: 'MINUTES')
+      }
+      steps {
+        script {
+          def rc = 1
+          try {
+            rc = sh(returnStatus: true, script: '''
+              docker save -o image.tar "$TEST_IMAGE"
+              # no bind mount: the agent runs in a container, so its workspace path does not exist for the docker daemon
+              scan() {
+                cid=$(docker create -v trivy-cache:/root/.cache "$TRIVY_IMAGE" image --quiet --input /tmp/image.tar --scanners vuln "$@" --table-mode detailed)
+                docker cp image.tar "$cid:/tmp/image.tar"
+                rc=0
+                docker start -a "$cid" || rc=$?
+                docker rm -v "$cid" > /dev/null
+                return $rc
+              }
+              scan --severity HIGH,CRITICAL --ignore-unfixed
+              scan --severity CRITICAL --ignore-unfixed --exit-code 10
+            ''')
+          } finally {
+            sh(returnStatus: true, script: '''rm -f image.tar''')
+          }
+          if (rc == 10) {
+            error "Trivy found fixable CRITICAL vulnerabilities in the image, see the list above"
+          } else if (rc != 0) {
+            unstable "Trivy could not scan the image (exit code ${rc})"
+          }
+        }
+      }
+    }
+
+    // Promote only what the tests above verified: requirements.txt. The release created here is what
+    // starts the tag build that publishes the image.
     stage('Promote to master') {
       when {
         branch 'testing'
@@ -75,50 +159,92 @@ pipeline {
           sh '''
             set -e
             set +x
+            rm -f "$WORKSPACE/.promoted-version"
             rm -rf promote
             git clone --branch master "https://$GIT_USER:$GITHUB_TOKEN@github.com/eea/$GIT_NAME.git" promote
             cp requirements.txt promote/requirements.txt
             cd promote
             if git diff --quiet -- requirements.txt; then
-              echo "master already has this requirements.txt, nothing to promote"
-              exit 0
+              if [ -n "$(git tag --points-at HEAD)" ]; then
+                echo "master already has this requirements.txt and is released, nothing to promote"
+                exit 0
+              fi
+              # a previous run pushed the commit but did not get to create the release
+              echo "master already has this requirements.txt but its latest commit is not released yet"
+            else
+              git add requirements.txt
+              git commit -m "Updated requirements.txt"
             fi
-            git add requirements.txt
-            git commit -m "Updated requirements.txt"
+            PREVIOUS=$(git tag | grep -E "$TAG_PATTERN" | sort -V | tail -n 1 || true)
+            VERSION=$(./src/docker/calculate_next_release.sh)
             git push origin HEAD:master
+            "$WORKSPACE/src/docker/create_release.sh" "$GIT_NAME" "$VERSION" "$(git rev-parse HEAD)" "$PREVIOUS"
+            echo "$VERSION" > "$WORKSPACE/.promoted-version"
           '''
         }
       }
     }
 
-    // Publish the image that was just built and tested, then let gitflow tag it and create the
-    // GitHub release. The image has to be on Docker Hub first, gitflow only waits for it (TAG_ONLY).
-    stage('Release') {
+    // The tag build publishes the image, nothing else tells that it did not happen (ex: Jenkins did not notice the
+    // tag). Wait for the image, so a release that never gets published turns this build red.
+    stage('Wait for the release') {
       when {
-        branch 'master'
+        allOf {
+          branch 'testing'
+          expression { fileExists('.promoted-version') }
+        }
+      }
+      options {
+        timeout(time: 35, unit: 'MINUTES')
       }
       steps {
-        withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GIT_TOKEN'), usernamePassword(credentialsId: 'jekinsdockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+        sh '''
+          VERSION=$(cat .promoted-version)
+          echo "Waiting for $DOCKERHUB_REPO:$VERSION to be published by the build of the tag $VERSION"
+          for i in $(seq 60); do
+            if [ "$(curl -s -o /dev/null -w '%{http_code}' "https://hub.docker.com/v2/repositories/$DOCKERHUB_REPO/tags/$VERSION")" = "200" ]; then
+              echo "$DOCKERHUB_REPO:$VERSION is published"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "$DOCKERHUB_REPO:$VERSION was not published in 30 minutes, check the build of the tag $VERSION in Jenkins" >&2
+          exit 1
+        '''
+      }
+    }
+
+    // Publish the image that was just built and tested from the tag. latest only moves to the newest release,
+    // so rebuilding an old tag does not take it backwards. The GitHub release already exists, it was created with the tag.
+    stage('Release') {
+      when {
+        expression { (env.TAG_NAME ?: '') ==~ env.TAG_PATTERN }
+      }
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'jekinsdockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
           script {
             try {
               sh '''
                 set -e
-                rm -f .released-version
+                VERSION="$TAG_NAME"
                 git fetch -q --force "https://github.com/eea/$GIT_NAME.git" "refs/tags/*:refs/tags/*"
-                if [ -n "$(git tag --points-at HEAD)" ]; then
-                  echo "This commit is already released as $(git tag --points-at HEAD | head -n 1), nothing to do"
-                  exit 0
+                # a tag only releases what is on master, anybody with write access can push a tag
+                if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then git fetch -q --unshallow "https://github.com/eea/$GIT_NAME.git" master; else git fetch -q "https://github.com/eea/$GIT_NAME.git" master; fi
+                if ! git merge-base --is-ancestor HEAD FETCH_HEAD; then
+                  echo "The commit tagged $VERSION is not on master, not releasing it"
+                  exit 1
                 fi
-                VERSION=$(./src/docker/calculate_next_release.sh)
                 echo "Releasing $DOCKERHUB_REPO:$VERSION"
-                echo "$VERSION" > .released-version
                 printf '%s' "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
                 docker tag "$TEST_IMAGE" "$DOCKERHUB_REPO:$VERSION"
-                docker tag "$TEST_IMAGE" "$DOCKERHUB_REPO:latest"
                 docker push "$DOCKERHUB_REPO:$VERSION"
-                docker push "$DOCKERHUB_REPO:latest"
-                docker pull eeacms/gitflow
-                docker run -i --rm --name="$GITFLOW_CONTAINER" -e GIT_BRANCH="master" -e GIT_NAME="$GIT_NAME" -e DOCKERHUB_REPO="$DOCKERHUB_REPO" -e GIT_TOKEN -e DOCKERHUB_USER -e DOCKERHUB_PASS -e GITFLOW_BEHAVIOR="TAG_ONLY" eeacms/gitflow
+                NEWEST=$(git tag | grep -E "$TAG_PATTERN" | sort -V | tail -n 1)
+                if [ "$NEWEST" = "$VERSION" ]; then
+                  docker tag "$TEST_IMAGE" "$DOCKERHUB_REPO:latest"
+                  docker push "$DOCKERHUB_REPO:latest"
+                else
+                  echo "$VERSION is not the newest release ($NEWEST), latest is left alone"
+                fi
               '''
             } finally {
               sh '''docker logout || true'''
@@ -128,33 +254,45 @@ pipeline {
       }
     }
 
-    // cdr and bdr follow the base image: point their Dockerfile to the version that was just released,
-    // their own master build then releases them. Only runs when the Release stage published a version.
+    // cdr and bdr follow the base image: point their Dockerfile to the version that was just released and
+    // create their release, their own tag build then publishes them. Only runs for the newest release, an old tag
+    // being rebuilt must not take them backwards.
     stage('Bump dependents') {
       when {
-        allOf {
-          branch 'master'
-          expression { fileExists('.released-version') }
-        }
+        expression { (env.TAG_NAME ?: '') ==~ env.TAG_PATTERN }
       }
       steps {
         withCredentials([string(credentialsId: 'eea-jenkins-token', variable: 'GITHUB_TOKEN')]) {
           sh '''
             set -e
             set +x
-            VERSION=$(cat .released-version)
+            VERSION="$TAG_NAME"
+            git fetch -q --force "https://github.com/eea/$GIT_NAME.git" "refs/tags/*:refs/tags/*"
+            NEWEST=$(git tag | grep -E "$TAG_PATTERN" | sort -V | tail -n 1)
+            if [ "$NEWEST" != "$VERSION" ]; then
+              echo "$VERSION is not the newest release ($NEWEST), the dependents are left alone"
+              exit 0
+            fi
             for repo in eea.docker.reportek.cdr-instance eea.docker.reportek.bdr-instance; do
               rm -rf "dependent-$repo"
               git clone --branch master "https://$GIT_USER:$GITHUB_TOKEN@github.com/eea/$repo.git" "dependent-$repo"
               cd "dependent-$repo"
               sed -i -E "/^FROM .*eeacms[/]reportek-base-dr:/ s#eeacms/reportek-base-dr:[^ ]+#eeacms/reportek-base-dr:$VERSION#" Dockerfile
               if git diff --quiet -- Dockerfile; then
-                echo "$repo already uses $VERSION, nothing to bump"
+                if [ -n "$(git tag --points-at HEAD)" ]; then
+                  echo "$repo already uses $VERSION and is released, nothing to bump"
+                  cd ..
+                  continue
+                fi
+                echo "$repo already uses $VERSION but its latest commit is not released yet"
               else
                 git add Dockerfile
                 git commit -m "Bump the base image to $VERSION"
-                git push origin HEAD:master
               fi
+              PREVIOUS=$(git tag | grep -E "$TAG_PATTERN" | sort -V | tail -n 1 || true)
+              NEXT=$(./src/docker/calculate_next_release.sh)
+              git push origin HEAD:master
+              "$WORKSPACE/src/docker/create_release.sh" "$repo" "$NEXT" "$(git rev-parse HEAD)" "$PREVIOUS"
               cd ..
             done
           '''
@@ -166,22 +304,25 @@ pipeline {
 
   post {
     always {
+      // the images built here are not needed once the build is over
+      sh '''
+        docker rmi "$TEST_IMAGE" > /dev/null 2>&1 || true
+        if [ -n "${TAG_NAME:-}" ]; then
+          docker rmi "$DOCKERHUB_REPO:$TAG_NAME" > /dev/null 2>&1 || true
+          docker rmi "$DOCKERHUB_REPO:latest" > /dev/null 2>&1 || true
+        fi
+      '''
       cleanWs(cleanWhenAborted: true, cleanWhenFailure: true, cleanWhenNotBuilt: true, cleanWhenSuccess: true, cleanWhenUnstable: true, deleteDirs: true)
     }
-    changed {
-      script {
-        def details = """<h1>${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}</h1>
-                         <p>Check console output at <a href="${env.BUILD_URL}/display/redirect">${env.JOB_BASE_NAME} - #${env.BUILD_NUMBER}</a></p>
-                      """
-        emailext(
-        subject: '$DEFAULT_SUBJECT',
-        body: details,
-        attachLog: true,
-        compressLog: true,
-        to: 'eea-edw-c-team-alerts@googlegroups.com',
-        recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'CulpritsRecipientProvider']]
-        )
-      }
+    // a new tag is a new job without a previous build, so report every failure instead of only the changes
+    failure {
+      script { notifyBuild() }
+    }
+    unstable {
+      script { notifyBuild() }
+    }
+    fixed {
+      script { notifyBuild() }
     }
   }
 }
