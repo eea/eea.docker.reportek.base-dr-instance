@@ -124,8 +124,17 @@ pipeline {
           try {
             rc = sh(returnStatus: true, script: '''
               docker save -o image.tar "$TEST_IMAGE"
-              docker run --rm -v "$PWD:/scan:ro" -v trivy-cache:/root/.cache -w /scan "$TRIVY_IMAGE" image --quiet --input /scan/image.tar --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed
-              docker run --rm -v "$PWD:/scan:ro" -v trivy-cache:/root/.cache -w /scan "$TRIVY_IMAGE" image --quiet --input /scan/image.tar --scanners vuln --severity CRITICAL --ignore-unfixed --exit-code 10
+              # no bind mount: the agent runs in a container, so its workspace path does not exist for the docker daemon
+              scan() {
+                cid=$(docker create -v trivy-cache:/root/.cache "$TRIVY_IMAGE" image --quiet --input /tmp/image.tar --scanners vuln "$@")
+                docker cp image.tar "$cid:/tmp/image.tar"
+                rc=0
+                docker start -a "$cid" || rc=$?
+                docker rm -v "$cid" > /dev/null
+                return $rc
+              }
+              scan --severity HIGH,CRITICAL --ignore-unfixed
+              scan --severity CRITICAL --ignore-unfixed --exit-code 10
             ''')
           } finally {
             sh(returnStatus: true, script: '''rm -f image.tar''')
