@@ -106,9 +106,9 @@ pipeline {
       }
     }
 
-    // Trivy, on the image that was just built. Fixable CRITICAL vulnerabilities fail the build, the HIGH ones are only
-    // listed (some of them are not fixed upstream, and there are fixable ones today). Findings can be accepted in
-    // a .trivyignore file in the root of the repository. When the scan cannot run (ex: the vulnerability database
+    // Trivy, on the image that was just built. Fixable HIGH and CRITICAL vulnerabilities fail the build, the ones
+    // without a fix upstream are ignored. Findings can be accepted in a .trivyignore file in the root of the repository.
+    // When the scan cannot run (ex: the vulnerability database
     // cannot be downloaded) the build is marked unstable, a Docker Hub or ghcr.io outage should not block a release.
     // The image is scanned from a tar file, so the Docker socket is not given to the scanner.
     stage('Scan image') {
@@ -133,14 +133,13 @@ pipeline {
                 docker rm -v "$cid" > /dev/null
                 return $rc
               }
-              scan --severity HIGH,CRITICAL --ignore-unfixed
-              scan --severity CRITICAL --ignore-unfixed --exit-code 10
+              scan --severity HIGH,CRITICAL --ignore-unfixed --exit-code 10
             ''')
           } finally {
             sh(returnStatus: true, script: '''rm -f image.tar''')
           }
           if (rc == 10) {
-            error "Trivy found fixable CRITICAL vulnerabilities in the image, see the list above"
+            error "Trivy found fixable HIGH or CRITICAL vulnerabilities in the image, see the list above"
           } else if (rc != 0) {
             unstable "Trivy could not scan the image (exit code ${rc})"
           }
