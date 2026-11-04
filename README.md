@@ -50,7 +50,7 @@ By default the `docker-compose.yml` includes the core Zope instances and a light
 | `ZOPE_UID` | `1000` | UID for Zope user |
 | `ZOPE_GID` | `1000` | GID for Zope group |
 | `ZOPE_ADMIN_USER` | `admin` | Initial admin username |
-| `ZOPE_ADMIN_PASSWORD` | `admin` | Initial admin password |
+| `ZOPE_ADMIN_PASSWORD` | none | Initial admin password. No default: without it no initial admin user is created |
 | `USE_BEAKER_SESSION` | `1` | Enables Beaker WSGI middleware for session management |
 | `REDIS_URL` | `redis://redis:6379/0` | Redis connection string (Currently used for Beaker sessions) |
 | `SESSION_SECRET` | `secret_key` | Secret used for signing session cookies |

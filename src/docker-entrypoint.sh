@@ -53,23 +53,31 @@ setup_permissions() {
 
 setup_admin_user() {
     local admin_user=${ZOPE_ADMIN_USER:-admin}
-    local admin_pass=${ZOPE_ADMIN_PASSWORD:-admin}
-    local inituser_file="$ZOPE_HOME/var/inituser"
+    local inituser_file="$ZOPE_HOME/inituser"
 
-    if [ ! -f "$inituser_file" ]; then
-        log "Creating initial admin user: $admin_user"
-        # Create inituser file with hashed password
-        $ZOPE_HOME/bin/python -c "
-from hashlib import sha1
+    if [ -f "$inituser_file" ]; then
+        return 0
+    fi
+
+    # There is no default password: without ZOPE_ADMIN_PASSWORD no initial admin user is created # betterleaks:allow (reads the variable, no literal)
+    if [ -z "${ZOPE_ADMIN_PASSWORD:-}" ]; then
+        log "ZOPE_ADMIN_PASSWORD is not set. Not creating an initial admin user."
+        return 0
+    fi
+
+    log "Creating initial admin user: $admin_user"
+    # Create inituser file with hashed password (values are passed as environment variables, not interpolated)
+    ZOPE_ADMIN_USER="$admin_user" $ZOPE_HOME/bin/python -c "
 import binascii
-user = '$admin_user'
-password = '$admin_pass'
+import os
+from hashlib import sha1
+user = os.environ['ZOPE_ADMIN_USER']
+password = os.environ['ZOPE_ADMIN_PASSWORD']  # betterleaks:allow (reads the variable, no literal)
 hash = '{SHA}' + binascii.b2a_base64(sha1(password.encode()).digest()).decode().strip()
 print(f'{user}:{hash}')
 " > "$inituser_file"
-        if [ "$(id -u)" = "0" ]; then
-            chown $ZOPE_UID:$ZOPE_GID "$inituser_file"
-        fi
+    if [ "$(id -u)" = "0" ]; then
+        chown $ZOPE_UID:$ZOPE_GID "$inituser_file"
     fi
 }
 
@@ -300,7 +308,7 @@ Environment Variables:
   ZOPE_UID             UID for Zope user (default: 1000)
   ZOPE_GID             GID for Zope group (default: 1000)
   ZOPE_ADMIN_USER      Admin username (default: admin)
-  ZOPE_ADMIN_PASSWORD  Admin password (default: admin)
+  ZOPE_ADMIN_PASSWORD  Initial admin password (no default, no initial admin user without it)
 
 Examples:
   docker run reportek start
