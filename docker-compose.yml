@@ -31,7 +31,7 @@ services:
       # Beaker Session Middleware Configuration
       - USE_BEAKER_SESSION=1
       - REDIS_URL=redis://redis:6379/0
-      - SESSION_SECRET=change_this_secret_in_production
+      - SESSION_SECRET=change_this_secret_in_production # betterleaks:allow (placeholder, overridden in deployments)
 
     volumes:
       # Persistent data
