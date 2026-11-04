@@ -179,9 +179,12 @@ main() {
     # Generate Zope configuration dynamically based on env vars
     local zope_debug_mode=${ZOPE_DEBUG_MODE:-off}
     local zope_verbose_security=${ZOPE_VERBOSE_SECURITY:-off}
-    log "Setting debug-mode to $zope_debug_mode and verbose-security to $zope_verbose_security"
+    # XML-RPC is off by default since Zope 6.2; Zope 5 had it on, so keep it on
+    local zope_enable_xmlrpc=${ZOPE_ENABLE_XMLRPC:-on}
+    log "Setting debug-mode to $zope_debug_mode, verbose-security to $zope_verbose_security and enable-xmlrpc to $zope_enable_xmlrpc"
     sed -i "s/^debug-mode DEBUG_MODE_MARKER/debug-mode $zope_debug_mode/g" "$ZOPE_HOME/etc/zope.conf"
     sed -i "s/^verbose-security VERBOSE_SECURITY_MARKER/verbose-security $zope_verbose_security/g" "$ZOPE_HOME/etc/zope.conf"
+    sed -i "s/^enable-xmlrpc XMLRPC_MARKER/enable-xmlrpc $zope_enable_xmlrpc/g" "$ZOPE_HOME/etc/zope.conf"
 
     case "$command" in
         start|fg)

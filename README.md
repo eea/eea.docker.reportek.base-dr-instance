@@ -64,6 +64,7 @@ By default the `docker-compose.yml` includes the core Zope instances and a light
 | `ZOPE_THREADS` | `4` | Number of threads to use in the Waitress WSGI server |
 | `ZOPE_DEBUG_MODE` | `off` | Toggles the Zope application debug mode (`on`, `off`) |
 | `ZOPE_VERBOSE_SECURITY` | `off` | Toggles verbose security exceptions inside Zope (`on`, `off`) |
+| `ZOPE_ENABLE_XMLRPC` | `on` | Toggles Zope's built-in XML-RPC support (`on`, `off`). Off by default upstream since Zope 6.2; kept on here as in Zope 5 |
 | `EVENT_LOG_LEVEL` | `INFO` | The root logging level for Zope/Waitress applications (`INFO`, `DEBUG`, `WARN`, `ERROR`) |
 | `ACCESS_LOG_LEVEL` | `WARN` | The WSGI access logging level (`INFO`, `WARN`, `ERROR`) |
 | `UNS_NOTIFICATIONS` | *(empty)*| Toggles the Unified Notification System (e.g. `on`) |
