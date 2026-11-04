@@ -53,7 +53,7 @@ pipeline {
         expression { !env.TAG_NAME || env.TAG_NAME ==~ env.TAG_PATTERN }
       }
       steps {
-        withCredentials([usernamePassword(credentialsId: 'jekinsdockerhub', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+        withCredentials([usernamePassword(credentialsId: 'jekinsdockerhub', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) { //betterleaks:allow
           script {
             try {
               // the Dockerfile pulls its base images from dhi.io (Docker Hardened Images)
@@ -220,7 +220,7 @@ pipeline {
         expression { (env.TAG_NAME ?: '') ==~ env.TAG_PATTERN }
       }
       steps {
-        withCredentials([usernamePassword(credentialsId: 'jekinsdockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+        withCredentials([usernamePassword(credentialsId: 'jekinsdockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) { //betterleaks:allow
           script {
             try {
               sh '''
