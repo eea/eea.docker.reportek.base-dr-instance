@@ -7,28 +7,28 @@
 Zope==6.3
 ZODB==6.4
 ZEO==6.2
-AccessControl==7.3
-Acquisition==6.2
-AuthEncoding==6.0
-BTrees==6.3
+AccessControl==7.5
+Acquisition==6.4
+AuthEncoding==6.1
+BTrees==6.5
 Chameleon==4.6.0
 DateTime==6.0
-DocumentTemplate==5.3
-ExtensionClass==6.2
+DocumentTemplate==5.4
+ExtensionClass==6.5
 MultiMapping==5.1
 Paste==3.10.1
 PasteDeploy==3.1.0
-Persistence==5.4
-RestrictedPython==8.4
-WebOb==1.8.9
+Persistence==5.5
+RestrictedPython==8.5
+WebOb==1.8.11
 WSGIProxy2==0.5.1
 ZConfig==4.3
-persistent==6.5
-transaction==5.0
+persistent==6.8
+transaction==5.1
 waitress==3.0.2
 zExceptions==6.0
 zc.lockfile==4.0
-zodbpickle==4.3
+zodbpickle==4.5
 
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
 # Zope Products
@@ -47,14 +47,14 @@ Products.Sessions==6.2
 Products.SiteErrorLog==7.0
 Products.StandardCacheManagers==6.1
 Products.TemporaryFolder==8.1
-Products.ZCatalog==7.3
+Products.ZCatalog==7.4
 Products.ZODBMountPoint==3.0
 Products.ZMIntrospection==1.3
 
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
 # Zope Components
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
-z3c.pt==5.1
+z3c.pt==5.2
 zope.annotation==6.0
 zope.browser==4.0
 zope.browsermenu==6.0
@@ -62,31 +62,31 @@ zope.browserpage==6.0
 zope.browserresource==6.0
 zope.cachedescriptors==6.0
 zope.component==7.1
-zope.configuration==7.0
-zope.container==7.2
+zope.configuration==7.1
+zope.container==7.3
 zope.contentprovider==7.0
 zope.contenttype==6.0
 zope.datetime==6.0
 zope.deferredimport==6.1.1
 zope.deprecation==6.0
 zope.dottedname==7.1
-zope.event==6.1
+zope.event==6.2
 zope.exceptions==6.0
 zope.filerepresentation==7.0
 zope.globalrequest==3.0
-zope.hookable==8.2
+zope.hookable==8.4
 zope.i18n==6.0
-zope.i18nmessageid==8.2
-zope.interface==8.2
+zope.i18nmessageid==8.4
+zope.interface==8.7
 zope.lifecycleevent==6.0
 zope.location==6.0
 zope.pagetemplate==6.1
 zope.processlifetime==4.0
-zope.proxy==7.1
+zope.proxy==7.3
 zope.ptresource==6.0
-zope.publisher==8.0
+zope.publisher==8.1
 zope.schema==8.1
-zope.security==8.3
+zope.security==8.4
 zope.sequencesort==6.0
 zope.site==6.0
 zope.size==6.0
@@ -163,7 +163,7 @@ five.localsitemanager==5.0
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
 # HTTP & Networking
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
-requests==2.32.5
+requests==2.34.2
 urllib3==2.8.0
 dnspython==2.9.0
 
@@ -177,15 +177,15 @@ pika==1.3.2
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
 lxml==6.1.1
 lxml_html_clean==0.4.5
-beautifulsoup4==4.14.3
+beautifulsoup4==4.15.0
 cssselect==1.4.0
 
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
 # Utilities
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
-cffi==2.0.0
+cffi==2.1.1
 greenlet==3.3.2
-python-dotenv==1.2.1
+python-dotenv==1.2.4
 python-dateutil>=2.9.0.post0
 xlwt==1.3.0
 z3c.zcmlhook==3.0
@@ -194,7 +194,7 @@ zipstream-ng==1.9.0
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
 # Testing
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
-zope.testrunner==8.2
+zope.testrunner==8.3
 coverage==7.13.4
 mock==5.2.0
 
