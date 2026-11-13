@@ -90,6 +90,12 @@ setup_zodb() {
     local cache_size=${ZODB_CACHE_SIZE:-50000}
     local shared_blob_dir=${ZEO_SHARED_BLOB_DIR:-off}
     local zeo_client_cache_size=${ZEO_CLIENT_CACHE_SIZE:-128MB}
+    # Optional per-thread memory cap for the ZODB object cache; unset keeps the
+    # object-count limit only
+    local cache_size_bytes_line=""
+    if [ -n "$ZODB_CACHE_SIZE_BYTES" ]; then
+        cache_size_bytes_line="    cache-size-bytes $ZODB_CACHE_SIZE_BYTES"
+    fi
     local zeo_blob_cache_line=""
     if [ -n "$ZEO_CLIENT_BLOB_CACHE_SIZE" ]; then
         zeo_blob_cache_line="        blob-cache-size $ZEO_CLIENT_BLOB_CACHE_SIZE"
@@ -102,7 +108,8 @@ setup_zodb() {
         cat <<EOF > "$zodb_conf"
 <zodb_db main>
     cache-size $cache_size
-    <relstorage>
+${cache_size_bytes_line:+$cache_size_bytes_line
+}    <relstorage>
         <postgresql>
             dsn $RELSTORAGE_DSN
         </postgresql>
@@ -117,7 +124,8 @@ EOF
         cat <<EOF > "$zodb_conf"
 <zodb_db main>
     cache-size $cache_size
-    <zeoclient>
+${cache_size_bytes_line:+$cache_size_bytes_line
+}    <zeoclient>
         server $ZEO_ADDRESS
         storage 1
         name zeostorage
@@ -135,7 +143,8 @@ EOF
         cat <<EOF > "$zodb_conf"
 <zodb_db main>
     cache-size $cache_size
-    <filestorage>
+${cache_size_bytes_line:+$cache_size_bytes_line
+}    <filestorage>
         path $ZOPE_HOME/var/filestorage/Data.fs
         blob-dir $ZOPE_HOME/var/blobstorage
     </filestorage>
@@ -181,8 +190,15 @@ main() {
     local zope_verbose_security=${ZOPE_VERBOSE_SECURITY:-off}
     # XML-RPC is off by default since Zope 6.2; Zope 5 had it on, so keep it on
     local zope_enable_xmlrpc=${ZOPE_ENABLE_XMLRPC:-on}
-    log "Setting debug-mode to $zope_debug_mode, verbose-security to $zope_verbose_security and enable-xmlrpc to $zope_enable_xmlrpc"
+    # verbose-security only works with the python implementation (it is silently
+    # ignored with C), so default to python when it is on and C otherwise
+    local zope_security_policy=${ZOPE_SECURITY_POLICY:-C}
+    if [ -z "$ZOPE_SECURITY_POLICY" ] && [ "$zope_verbose_security" = "on" ]; then
+        zope_security_policy=python
+    fi
+    log "Setting debug-mode to $zope_debug_mode, verbose-security to $zope_verbose_security, security-policy-implementation to $zope_security_policy and enable-xmlrpc to $zope_enable_xmlrpc"
     sed -i "s/^debug-mode DEBUG_MODE_MARKER/debug-mode $zope_debug_mode/g" "$ZOPE_HOME/etc/zope.conf"
+    sed -i "s/^security-policy-implementation SECURITY_POLICY_MARKER/security-policy-implementation $zope_security_policy/g" "$ZOPE_HOME/etc/zope.conf"
     sed -i "s/^verbose-security VERBOSE_SECURITY_MARKER/verbose-security $zope_verbose_security/g" "$ZOPE_HOME/etc/zope.conf"
     sed -i "s/^enable-xmlrpc XMLRPC_MARKER/enable-xmlrpc $zope_enable_xmlrpc/g" "$ZOPE_HOME/etc/zope.conf"
 

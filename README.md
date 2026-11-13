@@ -60,10 +60,12 @@ By default the `docker-compose.yml` includes the core Zope instances and a light
 | `ZEO_CLIENT_CACHE_SIZE` | `128MB` | ZEO client object cache size (e.g. `128MB`, `512MB`). Only applied when `ZEO_ADDRESS` is set |
 | `ZEO_CLIENT_BLOB_CACHE_SIZE` | *(unset)* | ZEO client local blob cache size (e.g. `1GB`). Only meaningful when `ZEO_ADDRESS` is set and `ZEO_SHARED_BLOB_DIR=off`; omitted from
          +config when unset |
-| `ZODB_CACHE_SIZE` | `50000` | Size of the ZODB cache for the main database |
+| `ZODB_CACHE_SIZE` | `50000` | Size of the ZODB cache for the main database, in objects per Zope thread |
+| `ZODB_CACHE_SIZE_BYTES` | *(empty)* | Optional memory cap (e.g. `400MB`) for the ZODB cache of each Zope thread, applied on top of `ZODB_CACHE_SIZE` |
 | `ZOPE_THREADS` | `4` | Number of threads to use in the Waitress WSGI server |
 | `ZOPE_DEBUG_MODE` | `off` | Toggles the Zope application debug mode (`on`, `off`) |
 | `ZOPE_VERBOSE_SECURITY` | `off` | Toggles verbose security exceptions inside Zope (`on`, `off`) |
+| `ZOPE_SECURITY_POLICY` | `C` (`python` if `ZOPE_VERBOSE_SECURITY=on`) | Zope security policy implementation (`python`, `C`). Verbose security only works with `python` and is ignored with `C` |
 | `ZOPE_ENABLE_XMLRPC` | `on` | Toggles Zope's built-in XML-RPC support (`on`, `off`). Off by default upstream since Zope 6.2; kept on here as in Zope 5 |
 | `EVENT_LOG_LEVEL` | `INFO` | The root logging level for Zope/Waitress applications (`INFO`, `DEBUG`, `WARN`, `ERROR`) |
 | `ACCESS_LOG_LEVEL` | `WARN` | The WSGI access logging level (`INFO`, `WARN`, `ERROR`) |
