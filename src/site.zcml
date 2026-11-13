@@ -5,6 +5,9 @@
     <include package="Zope2.App" file="meta.zcml" />
     <include package="Zope2.App" />
 
+    <!-- Logs the failures of the publisher in error_log -->
+    <include package="Products.SiteErrorLog" />
+
     <!-- Products -->
     <include package="Products.Reportek" />
 
