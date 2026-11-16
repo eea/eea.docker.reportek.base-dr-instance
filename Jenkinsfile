@@ -126,8 +126,9 @@ pipeline {
               docker save -o image.tar "$TEST_IMAGE"
               # no bind mount: the agent runs in a container, so its workspace path does not exist for the docker daemon
               scan() {
-                cid=$(docker create -v trivy-cache:/root/.cache "$TRIVY_IMAGE" image --quiet --input /tmp/image.tar --scanners vuln "$@" --table-mode detailed)
+                cid=$(docker create -v trivy-cache:/root/.cache "$TRIVY_IMAGE" image --quiet --input /tmp/image.tar --scanners vuln --ignorefile /tmp/.trivyignore "$@" --table-mode detailed)
                 docker cp image.tar "$cid:/tmp/image.tar"
+                if [ -f .trivyignore ]; then docker cp .trivyignore "$cid:/tmp/.trivyignore"; fi
                 rc=0
                 docker start -a "$cid" || rc=$?
                 docker rm -v "$cid" > /dev/null

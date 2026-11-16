@@ -1,0 +1,9 @@
+# linux-libc-dev only ships kernel headers, which are not a runtime attack surface. Fixed in Debian
+# 6.12.117-1, but the dhi.io/python base image still ships 6.12.116-1+dhi0.
+# Remove these entries once the base image is rebuilt with the fixed package.
+CVE-2026-98466
+CVE-2026-98715
+CVE-2026-98853
+CVE-2026-99109
+CVE-2026-99281
+CVE-2026-99288
