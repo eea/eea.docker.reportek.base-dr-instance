@@ -165,7 +165,7 @@ five.localsitemanager==5.0
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
 requests==2.34.2
 urllib3==2.8.0
-dnspython==2.9.0
+dnspython==2.9.2
 
 # >=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=
 # Message Queue
@@ -212,5 +212,5 @@ graypy==2.1.0
 
 eea.sentry==3.1
 # eea.graylogger>=2.0
-products-reportek==101.1
+products-reportek==101.2
 # promote test
